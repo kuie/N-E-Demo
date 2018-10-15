@@ -1,0 +1,134 @@
+{
+  "name": "evt1",
+  "version": "0.1.0",
+  "author": "",
+  "description": "An electron-vue project",
+  "license": "",
+  "private": true,
+  "main": "./dist/electron/main.js",
+  "scripts": {
+    "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
+    "build:electron": "cross-env BUILD_TARGET=electron node .electron-vue/build.js && electron-builder ./",
+    "build:nw": "cross-env BUILD_TARGET=nw node .electron-vue/build.js",
+    "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
+    "dev:electron": "cross-env NODE_ENV=development node .electron-vue/dev-runner.js",
+    "dev:nw": "cross-env NODE_ENV=development node .electron-vue/dev-server.js",
+    "build:dir": "node .electron-vue/build.js && electron-builder --dir",
+    "pack": "npm run pack:main && npm run pack:renderer",
+    "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
+    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "productName": "evt1",
+    "appId": "org.simulatedgreg.electron-vue",
+    "directories": {
+      "output": "build/electron"
+    },
+    "files": [
+      "dist/electron/**/*"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "mac": {
+      "icon": "build/icons/icon.icns"
+    },
+    "win": {
+      "icon": "build/icons/icon.ico"
+    },
+    "linux": {
+      "icon": "build/icons"
+    }
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "dexie": "^2.0.4",
+    "electron-updater": "^3.1.2",
+    "iview": "^3.1.2",
+    "js-cookie": "^2.2.0",
+    "node-webkit-updater": "^0.3.3",
+    "nw": "0.14.7-sdk",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.1.5",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-minify-webpack-plugin": "^0.3.1",
+    "babel-plugin-istanbul": "^5.0.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.26.0",
+    "cfonts": "^2.2.1",
+    "chai": "^4.2.0",
+    "chalk": "^2.4.1",
+    "connect-history-api-fallback": "^1.5.0",
+    "copy-webpack-plugin": "^4.5.2",
+    "cross-env": "^5.2.0",
+    "css-loader": "^0.28.11",
+    "del": "^3.0.0",
+    "devtron": "^1.4.0",
+    "electron": "^3.0.2",
+    "electron-builder": "^20.28.4",
+    "electron-debug": "^2.0.0",
+    "electron-devtools-installer": "^2.2.4",
+    "eventsource-polyfill": "^0.9.6",
+    "express": "^4.16.3",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^2.0.0",
+    "friendly-errors-webpack-plugin": "^1.7.0",
+    "html-webpack-plugin": "^3.2.0",
+    "http-proxy-middleware": "^0.19.0",
+    "iconv-lite": "^0.4.24",
+    "inject-loader": "^4.0.1",
+    "innosetup-compiler": "^5.5.9",
+    "multispinner": "^0.2.1",
+    "node-loader": "^0.6.0",
+    "node-sass": "^4.9.3",
+    "nw-builder": "^3.5.4",
+    "optimize-css-assets-webpack-plugin": "^3.2.0",
+    "postcss-loader": "^2.1.6",
+    "require-dir": "^1.0.0",
+    "sass-loader": "^7.1.0",
+    "semver": "^5.3.0",
+    "spectron": "^3.7.1",
+    "style-loader": "^0.23.0",
+    "url-loader": "^0.6.2",
+    "vue-html-loader": "^1.2.4",
+    "vue-loader": "^13.0.5",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^3.12.0",
+    "webpack-bundle-analyzer": "^3.0.2",
+    "webpack-dev-middleware": "^2.0.0",
+    "webpack-dev-server": "^2.11.3",
+    "webpack-hot-middleware": "^2.24.2",
+    "webpack-merge": "^4.1.4"
+  },
+  "installConfig": {
+    "pnp": true
+  },
+  "engines": {
+    "node": ">= 7.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "node-remote": "<all_urls>",
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
+}
