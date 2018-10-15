@@ -64,3 +64,5 @@ nwjs_urlbase "http://localhost/nwjs/v"
 ````
 ---
 
+添加electron 安装支持 指定electron 包的安装地址
+详细内容请参看[electron 科学安装](https://www.jianshu.com/p/098fa716581e)
