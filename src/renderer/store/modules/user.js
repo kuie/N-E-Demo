@@ -33,6 +33,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             login(account, userInfo.password).then(response => {
                 const data = response.data;
+                console.log(data);
                 setID(data.id);
                 setToken(data.token);
                 commit('SET_ID', data.id);

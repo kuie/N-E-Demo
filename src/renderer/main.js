@@ -15,6 +15,9 @@ if (process.env.PLAY_MODE === 'nw') {
 Vue.use(iView, {transfer: true});
 
 let unLoginWhiteList = ['/login', '/register'];
+let redirectList = [
+    {path: '/baidu', redirect: 'https://www.baidu.com'}
+];
 router.beforeEach((to, from, next) => {
     //为什么要有这个正则？从第一个页面跳转后请求会在to.poth后面多一个/
     if (/.+\/$/.test(to.path)) {
@@ -42,6 +45,8 @@ router.beforeEach((to, from, next) => {
             next('/login');
         });
     } else {
+        /*todo 在这里添加针对重定向路由表的控制*/
+        console.log(to.path);
         next();
     }
 });
