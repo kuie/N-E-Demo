@@ -7,7 +7,7 @@
             <Input v-model="loginForm.password" placeholder="请输入密码"></Input>
         </FormItem>
         <FormItem>
-            <!--<Tag color="orange" v-for="(user,index) in userList" :key="index">{{user.account}}</Tag>-->
+            <Tag color="orange" v-for="(user,index) in userList" :key="index">{{user.username}}</Tag>
         </FormItem>
         <FormItem>
             <Button type="primary" @click="login">登陆</Button>
@@ -26,13 +26,12 @@
                     identity: 'clientServer',
                     username: '',
                     password: ''
-                }
+                },
+                userList: []
             }
         },
         mounted() {
-            this.userDB.account.toArray().then(arr => {
-                console.log(arr);
-            });
+            this.account.toArray().then(arr => this.userList = arr);
         },
         /*computed: {
             async userList() {
@@ -46,9 +45,10 @@
         methods: {
             login() {
                 store.dispatch('Login', this.loginForm).then(data => {
-                    this.$router.push({name: 'index'});
+                    // this.$router.push({name: 'index'});
                     //以id作为用户唯一标识
-                    this.account.where("id").equals().first(result => {
+                    this.account.where("id").equals(data.id).first(result => {
+                        console.log(result);
                         if (result) {
                             //更新
                             this.account.update(result.index, {
