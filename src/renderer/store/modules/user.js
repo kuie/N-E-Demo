@@ -1,4 +1,4 @@
-import {setID, setToken, removeCookie} from "../../utils/auth";
+import {setID, removeCookie} from "../../utils/auth";
 import {login, register} from "../../api/baseHandle";
 
 const state = {
@@ -30,14 +30,17 @@ const mutations = {
 const actions = {
     Login({commit}, userInfo) {
         const account = userInfo.username.trim();
+        let userList = sessionStorage.getItem('user_list');
+        let accountReg = new RegExp(`"account" ?: ?"${account}"`, 'g');
+        if (accountReg.test(userList)) return Promise.reject('该账号已登录');
+        userList = userList ? JSON.parse(userList) : [];
         return new Promise((resolve, reject) => {
             login(account, userInfo.password).then(response => {
                 const data = response.data;
-                console.log(data);
-                setID(data.id);
-                setToken(data.token);
-                commit('SET_ID', data.id);
-                commit('SET_TOKEN', data.token);
+                let token = data.token;
+                let id = data.id;
+                userList.push({account, token, id});
+                sessionStorage.setItem('user_list', JSON.stringify(userList));
                 resolve();
             }).catch(error => {
                 console.log(error);
@@ -57,6 +60,8 @@ const actions = {
         });
     },
     GetRoles({commit}, accountId) {
+        console.log('开始获取权限');
+        console.log(accountId);
         return new Promise((resolve, reject) => {
             getRoles(accountId).then(response => {
                 const data = response.data;

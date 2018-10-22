@@ -14,34 +14,36 @@
 </template>
 
 <script>
-	import store from '../../../store'
+    import store from '../../../store'
 
-	export default {
-		data() {
-			return {
-				loginForm: {
-					id: '测试id',
-					identity: 'clientServer',
-					username: '',
-					password: ''
-				}
-			}
-		},
-		mounted() {
-			console.log(store);
-		},
-		methods: {
-			login() {
-				store.dispatch('Login', this.loginForm).then(res => {
-					this.$router.push({ name: 'index' });
-				}).catch(e => console.log(e)).finally(() => {
-				});
-			},
-			toRegister() {
-				this.$router.push({ name: 'register' })
-			}
-		}
-	}
+    export default {
+        data() {
+            return {
+                loginForm: {
+                    id: '测试id',
+                    identity: 'clientServer',
+                    username: '',
+                    password: ''
+                }
+            }
+        },
+        mounted() {
+            console.log(store);
+        },
+        methods: {
+            login() {
+                store.dispatch('Login', this.loginForm).then(res => {
+                    this.$router.push({name: 'index'});
+                }).catch(e => {
+                    console.log(e);
+                    this.$Message.info({content: e, duration: 5});
+                });
+            },
+            toRegister() {
+                this.$router.push({name: 'register'})
+            }
+        }
+    }
 </script>
 
 <style scoped>

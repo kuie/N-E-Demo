@@ -1,14 +1,17 @@
 const http = require('http');
-const path = require('path');
 import axios from 'axios';
 import {Message, Modal} from 'iview';
 import store from '../store';
 import qs from 'qs';
 
 const baseConfig = {
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Access-Control-Allow-Origin': '*'
+    },
+    method:'POST',
+    query: {_timestamp: Date.now()},
     withCredentials: true, // 上传cookie
-    // baseURL: 'http://localhost:10000/mock/5ba04ffb6a6fc725949f24ef', //mock
-    // baseURL: 'http://localhost:3000/electron', // koa2
     baseURL: 'http://106.12.100.234:10005/mock/5bc45f7c8ebc42193f2615cf', // 106.12.100.234
     timeout: 30 * 1000// 请求超时时间
 };
@@ -17,9 +20,7 @@ const baseConfig = {
 const service = axios.create(baseConfig);
 
 const sendInterceptors = config => {
-    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     store.getters.token && (config.headers['Authorization'] = `Bearer ${store.getters.token}`);
-    config.url = config.url + '?_timestamp=' + Date.now();
     config.data = qs.stringify(config.data);
     return config;
 };
@@ -29,7 +30,6 @@ const sendError = error => {
     Message.error({content: '请求错误！', duration: 5});
     Promise.reject(error);
 };
-
 
 // request拦截器
 service.interceptors.request.use(sendInterceptors, sendError);
@@ -124,6 +124,7 @@ export const net = config => {
                     } else {
                         Message.error({content: data.msg, duration: 5});
                     }
+                } else {
                     resolve(data);
                 }
             });
@@ -135,3 +136,4 @@ export const net = config => {
 };
 
 export default net;
+// export default service;
