@@ -40,8 +40,7 @@ const actions = {
                 let token = data.token;
                 let id = data.id;
                 userList.push({account, token, id});
-                sessionStorage.setItem('user_list', JSON.stringify(userList));
-                resolve();
+                resolve(data);
             }).catch(error => {
                 console.log(error);
                 reject(error);

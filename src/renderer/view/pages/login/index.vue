@@ -7,8 +7,10 @@
             <Input v-model="loginForm.password" placeholder="请输入密码"></Input>
         </FormItem>
         <FormItem>
+            <!--<Tag color="orange" v-for="(user,index) in userList" :key="index">{{user.account}}</Tag>-->
+        </FormItem>
+        <FormItem>
             <Button type="primary" @click="login">登陆</Button>
-            <Button style="margin-left: 8px" @click="toRegister">注册</Button>
         </FormItem>
     </Form>
 </template>
@@ -28,19 +30,48 @@
             }
         },
         mounted() {
-            console.log(store);
+            this.userDB.account.toArray().then(arr => {
+                console.log(arr);
+            });
         },
+        /*computed: {
+            async userList() {
+                let list = [1];
+                await this.userDB.account.toArray().then(arr => {
+                    list = arr;
+                });
+                return list
+            }
+        },*/
         methods: {
             login() {
-                store.dispatch('Login', this.loginForm).then(res => {
+                store.dispatch('Login', this.loginForm).then(data => {
                     this.$router.push({name: 'index'});
+                    //以id作为用户唯一标识
+                    this.account.where("id").equals().first(result => {
+                        if (result) {
+                            //更新
+                            this.account.update(result.index, {
+                                id: data.id,
+                                username: '测试1',
+                                lastModify: new Date() - 0,
+                                lastToken: data.token
+                            });
+                        } else {
+                            //新增
+                            this.account.add({
+                                id: data.id,
+                                username: '测试1',
+                                lastModify: new Date() - 0,
+                                lastToken: data.token
+                            });
+                        }
+                    })
+
                 }).catch(e => {
                     console.log(e);
-                    this.$Message.info({content: e, duration: 5});
+                    this.$Message.info({content: '登陆错误', duration: 5});
                 });
-            },
-            toRegister() {
-                this.$router.push({name: 'register'})
             }
         }
     }

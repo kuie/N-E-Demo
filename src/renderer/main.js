@@ -5,6 +5,7 @@ import iView from 'iview'
 import App from './App'
 import router from './router'
 import store from './store'
+import db from './utils/DB';
 
 Vue.config.productionTip = false;
 if (process.env.PLAY_MODE === 'nw') {
@@ -13,6 +14,7 @@ if (process.env.PLAY_MODE === 'nw') {
 }
 
 Vue.use(iView, {transfer: true});
+Vue.use(db);
 
 let unLoginWhiteList = ['/login', '/register'];
 let redirectList = [

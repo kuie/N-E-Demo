@@ -1,16 +1,16 @@
 import Dexie from 'dexie';
-let db = new Dexie("comic_book_db");
-db.version(1).stores({ comic: '++id,index,name' });
-onmessage = res => {
-	//删库并刷入新数据
-	db
-		.delete()
-		.then(() => console.log('原数据已删除'))
-		.then(() => db.open())
-		.then(() => db.comic.bulkPut(res.data[1]))
-		.catch(e => console.log(e))
-		.then(lastId => postMessage({ code: 200, msg: `新增数据：${lastId}条` }))
-		.catch(e => console.log(e)).finally(() => {
-		close();
-	});
+//生成用户库
+const userDB = new Dexie('userDB');
+userDB.version(1).stores({
+    //账户表
+    account: "++index,id,username,lastModify,lastToken"
+});
+
+const db = {
+    install(Vue, option) {
+        Vue.prototype.account = userDB.account;//用户表
+        Vue.prototype.$dexie = Dexie;//原生Dexie 对象
+    }
 };
+
+export default db;
