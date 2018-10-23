@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain, globalShortcut, session} from 'electron'
+import {app, BrowserWindow, ipcMain, globalShortcut, session, remote} from 'electron'
 
 /*session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({responseHeaders: `default-src 'none'`})
@@ -14,6 +14,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
+const businessWinList = {};
 
 function createWindow() {
     const winURL = process.env.NODE_ENV === 'development'
@@ -25,15 +26,28 @@ function createWindow() {
      */
     mainWindow = new BrowserWindow(wConfig);
 
-    ipcMain.on('min', e => mainWindow.minimize());
-    ipcMain.on('max', e => {
-        if (mainWindow.isMaximized()) {
-            mainWindow.unmaximize()
+    ipcMain.on('min', (e, win) => {
+        win = win || mainWindow;
+        win.minimize()
+    });
+    ipcMain.on('max', (e, win) => {
+        win = remote.getCurrentWindow;
+        if (win.isMaximized()) {
+            win.unmaximize()
         } else {
-            mainWindow.maximize()
+            win.maximize()
         }
     });
-    ipcMain.on('close', e => mainWindow.close());
+    ipcMain.on('close', (e, win) => {
+        win = win || mainWindow;
+        win.close();
+    });
+    ipcMain.on('newBusinessWin', (e, user) => {
+        if (businessWinList[user.id]) return false;
+        businessWinList[user.id] = new BrowserWindow({parent: mainWindow, show: false});
+        businessWinList[user.id].once('ready-to-show', () => businessWinList[user.id].show());
+        businessWinList[user.id].loadURL('http://localhost:9080');
+    });
     mainWindow.once('ready-to-show', () => mainWindow.show());
     mainWindow.loadURL(winURL);
     mainWindow.on('closed', () => mainWindow = null);

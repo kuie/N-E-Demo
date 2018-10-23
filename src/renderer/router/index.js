@@ -2,44 +2,36 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Layout from '../view/layout/layout'
 import Empty from '../view/layout/empty'
+import E404 from '../view/error/404'
 
 const _vue = path => r => require.ensure([], () => r(require(`../view/pages/${path}.vue`)));
 Vue.use(Router);
 
 export const constantRouterMap = [
-    /*根据是否有欢迎页进行控制，如果没有欢迎页全部重定向到登陆页面*/
-    // { path: '/', component: _vue('index'), hidden: true },
     {
         path: '/login',
         component: Empty,
         children: [{name: 'login', path: '', component: _vue('login/index')}],
         hidden: true
     },
-    {
-        path: '/register',
-        component: Empty,
-        children: [{name: 'register', path: '', component: _vue('register/index')}],
-        hidden: true
-    },
-    {path: '*', redirect: '/login'}
+    {path: '/404', component: E404, hidden: true}
 ];
 
 export const routers = [
+    {path: '/', redirect: '/home', hidden: true},
+    // 首页
     {
-        path: '/',
+        path: '/home',
         component: Layout,
-        redirect: 'noredirect',
         children: [
             {
                 path: '',
                 component: _vue('index'),
-                noDropdown: true,
-                name: 'index',
-                meta: {title: '首页', keepAlive: true},
+                meta: {title: '首页'},
             }
         ]
     },
-    {path: '*', redirect: '/'}
+    {path: '*', redirect: '/404'}
 ];
 
 export default new Router({

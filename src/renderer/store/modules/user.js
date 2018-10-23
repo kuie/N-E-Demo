@@ -1,5 +1,6 @@
-import {setID, removeCookie} from "../../utils/auth";
-import {login, register} from "../../api/baseHandle";
+import {removeCookie} from "../../utils/auth";
+import {login} from "../../api/baseHandle";
+import Router, {routers} from "../../router";
 
 const state = {
     id: '',
@@ -16,12 +17,6 @@ const mutations = {
     SET_ID(state, id) {
         state.id = id;
     },
-    SET_IDENTITY(state, identity) {
-        state.identity = identity;
-    },
-    SET_ROLES(state, roles) {
-        state.roles = roles;
-    },
     SET_TOKEN: (state, token) => {
         state.token = token;
     }
@@ -30,71 +25,28 @@ const mutations = {
 const actions = {
     Login({commit}, userInfo) {
         const account = userInfo.username.trim();
+        /*读取已登录用户列表 确定用户是否已登陆*/
         let userList = sessionStorage.getItem('user_list');
         let accountReg = new RegExp(`"account" ?: ?"${account}"`, 'g');
         if (accountReg.test(userList)) return Promise.reject('该账号已登录');
         userList = userList ? JSON.parse(userList) : [];
+
         return new Promise((resolve, reject) => {
             login(account, userInfo.password).then(response => {
                 const data = response.data;
-                let token = data.token;
-                let id = data.id;
+                const token = data.token;
+                const id = data.id;
+                /*更新用户登陆列表*/
                 userList.push({account, token, id});
+                sessionStorage.setItem('user_list', JSON.stringify(userList));
                 resolve(data);
             }).catch(error => {
-                console.log(error);
-                reject(error);
-            });
-        });
-    },
-    Register({commit}, userInfo) {
-        userInfo.username = userInfo.username.trim();
-        return new Promise((resolve, reject) => {
-            register(userInfo).then(response => {
-                if (response.code === 200) resolve();
-            }).catch(error => {
-                console.log(error);
-                reject(error);
-            });
-        });
-    },
-    GetRoles({commit}, accountId) {
-        console.log('开始获取权限');
-        console.log(accountId);
-        return new Promise((resolve, reject) => {
-            getRoles(accountId).then(response => {
-                const data = response.data;
-                setID(data.id);
-                commit('SET_IDENTITY', data.identity);
-                commit('SET_ID', data.id);
-                commit('SET_NAME', data.operatorName);
-                let role = data.resources;
-                role.push('account');
-                commit('SET_ROLES', role);
-                resolve(response);
-            }).catch(error => {
-                console.log(error);
-                if (error.code !== 50008 && error.code !== 50012 && error.code !== 50014) {
-                    reject(error);
-                }
-            });
-        });
-    },
-    LogOut({commit}) {
-        return new Promise((resolve, reject) => {
-            logout().then(() => {
-                commit('SET_ROLES', []);
-                removeCookie();
-                resolve();
-            }).catch(error => {
-                console.log(error);
                 reject(error);
             });
         });
     },
     FedLogOut({commit}) {
         return new Promise(resolve => {
-            commit('SET_ROLES', []);
             removeCookie();
             resolve();
         });

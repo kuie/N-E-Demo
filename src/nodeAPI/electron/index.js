@@ -1,6 +1,11 @@
 const {ipcRenderer: ipc} = require('electron');
-module.exports = {
-    windowHandle(type) {
-        ipc.send(type);
+const obj = {
+    winList: {},
+    windowHandle(type, window) {
+        ipc.send(type, window);
+    },
+    newBusinessWin(account) {
+        ipc.send('newBusinessWin', account);
     }
 };
+module.exports = obj;
