@@ -1,6 +1,7 @@
 import {removeCookie} from "../../utils/auth";
 import {login} from "../../api/baseHandle";
-import Router, {routers} from "../../router";
+import api from '../../../nodeAPI';
+import {Message} from 'iview';
 
 const state = {
     id: '',
@@ -33,6 +34,7 @@ const actions = {
 
         return new Promise((resolve, reject) => {
             login(account, userInfo.password).then(response => {
+                if (api.searchLoginState()) return reject('账号已登录,请勿重复登陆');
                 const data = response.data;
                 const token = data.token;
                 const id = data.id;

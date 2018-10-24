@@ -1,23 +1,21 @@
 const {ipcRenderer: ipc} = require('electron');
 const uuid = _ => sessionStorage.getItem('uuid');
-ipc.on('log', function (e, a, b, c) {
-    console.log(e, a, b, c);
-});
+ipc.on('log', (e, arg) => console.log(arg));
 
 const obj = {
+    /*顶部条基础操作 最大，最小，关闭*/
     windowHandle(type) {
         ipc.send(type, uuid());
     },
+    /*新建窗口*/
     newBusinessWin() {
         ipc.send('newBusinessWin');
     },
-    searchLoginAccount() {
-        ipc.once('searchLoginAccount', (e, list) => {
-            console.log(list);
-            // list ? resolve(list) : reject('查询登陆账户列表错误');
-        });
-        ipc.send('searchLoginAccount');
+    /*查询全部窗口*/
+    searchLoginState() {
+        return ipc.sendSync('searchLoginState', uuid());
     },
+    /*登陆广播*/
     loginBroadcast(accountID) {
         ipc.send('loginBroadcast', {uuid: uuid(), accountID});
     }

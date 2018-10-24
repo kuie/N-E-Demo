@@ -15,7 +15,6 @@ if (process.env.NODE_ENV !== 'development') {
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-let mainWindow;
 let appIcon = null;
 const businessWinList = [];
 const winURL = process.env.NODE_ENV === 'development'
@@ -24,6 +23,7 @@ const winURL = process.env.NODE_ENV === 'development'
 const createRendererWindow = _ => {
     const uuid = uuidV1();
     let win = new BrowserWindow(wConfig);
+    /*子窗口关闭事件*/
     win.on('closed', () => {
         let index = -1;
         businessWinList.some((item, i) => {
@@ -35,11 +35,8 @@ const createRendererWindow = _ => {
             businessWinList.splice(index, 1);
         }
         win = null;
-        /*当全部窗口关闭后主进程自动退出*/
-        if (!businessWinList.length) {
-            mainWindow.close();
-        }
     });
+    /*加载页面后展示页面*/
     win.once('ready-to-show', () => win.show());
     win.loadURL(`${winURL}?uuid=${uuid}`);
     /*
@@ -61,18 +58,6 @@ const getWin = uuid => {
 };
 
 function createWindow() {
-    /**
-     * Initial window options
-     */
-    mainWindow = new BrowserWindow({
-        frame: false,
-        useContentSize: true,//自适应框内内容
-        show: false,
-        nodeIntegration: false,//禁止node集成
-        contextIsolation: true,//上下文隔离
-    });
-
-
     ipcMain.on('min', (e, uuid) => {
         let win = getWin(uuid).win;
         win.minimize();
@@ -90,8 +75,15 @@ function createWindow() {
         win.close();
     });
     ipcMain.on('newBusinessWin', e => businessWinList.push(createRendererWindow()));
-    ipcMain.on('searchLoginAccount', e => {
-        e.sender.send('searchLoginAccount', businessWinList.filter(v => !!v.id).map(v => v.id));
+    ipcMain.on('searchLoginState', (e, uuid) => {
+        let result = false;
+        businessWinList.some(item => {
+            if (item.uuid === uuid) {
+                result = true;
+            }
+            return result;
+        });
+        e.returnValue = result;
     });
     ipcMain.on('loginBroadcast', (e, arg) => {
         businessWinList.some(item => {
@@ -103,11 +95,10 @@ function createWindow() {
     });
 
 
-    mainWindow.on('closed', () => mainWindow = null);
     //注册全局快捷键
-    globalShortcut.register('F12', () => {
-        mainWindow.openDevTools();
-    });
+    // globalShortcut.register('F12', () => {
+    //     mainWindow.openDevTools();
+    // });
     businessWinList.push(createRendererWindow());
 
     let tray = new Tray('G:/N-E-Demo/build/icons/icon.ico');
@@ -121,6 +112,12 @@ function createWindow() {
 
 app.on('ready', createWindow);
 
+app.on('activate', () => {
+    if (!businessWinList.length) {
+        businessWinList.push(createRendererWindow());
+    }
+});
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
@@ -128,23 +125,59 @@ app.on('window-all-closed', () => {
     if (appIcon) appIcon.destroy()
 });
 
-
-app.setUserTasks([
+app.setJumpList([
     {
-        program: process.execPath,
-        // arguments: '--new-window',
-        iconPath: process.execPath,
-        iconIndex: 0,
-        title: '登陆其他账号',
-        description: '登陆新账号'
+        type: 'custom',
+        name: 'Recent Projects',
+        items: [
+            {type: 'file', path: 'C:\\Projects\\project1.proj'},
+            {type: 'file', path: 'C:\\Projects\\project2.proj'}
+        ]
+    },
+    { // has a name so `type` is assumed to be "custom"
+        name: 'Tools',
+        items: [
+            {
+                type: 'task',
+                title: 'Tool A',
+                program: process.execPath,
+                args: '--run-tool-a',
+                icon: process.execPath,
+                iconIndex: 0,
+                description: 'Runs Tool A'
+            },
+            {
+                type: 'task',
+                title: 'Tool B',
+                program: process.execPath,
+                args: '--run-tool-b',
+                icon: process.execPath,
+                iconIndex: 0,
+                description: 'Runs Tool B'
+            }
+        ]
+    },
+    {type: 'frequent'},
+    { // has no name and no type so `type` is assumed to be "tasks"
+        items: [
+            {
+                type: 'task',
+                title: 'New Project',
+                program: process.execPath,
+                args: '--new-project',
+                description: 'Create a new project.'
+            },
+            {type: 'separator'},
+            {
+                type: 'task',
+                title: 'Recover Project',
+                program: process.execPath,
+                args: '--recover-project',
+                description: 'Recover Project'
+            }
+        ]
     }
 ]);
-
-app.on('activate', () => {
-    if (mainWindow === null) {
-        createWindow()
-    }
-});
 
 /**
  * Auto Updater

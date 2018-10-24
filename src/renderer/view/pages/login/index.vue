@@ -15,7 +15,6 @@
             <Button type="primary" @click="login">登陆</Button>
         </FormItem>
         <Button @click="addWin">新增窗口</Button>
-        <Button @click="searchLoginAccount">查询已登录账户</Button>
     </Form>
 </template>
 
@@ -73,9 +72,6 @@
             },
             addWin() {
                 api.newBusinessWin();
-            },
-            searchLoginAccount() {
-                api.searchLoginAccount();
             }
         }
     }
