@@ -1,6 +1,5 @@
 <template>
     <div class="titleBarBox">
-        <span>操作系统:{{platform}}</span>
         <span>访问路径:{{$route.path}}</span>
         <div class="controlBtnGroup">
             <title-btn type="min"/>
@@ -11,18 +10,12 @@
 </template>
 
 <script>
-	import titleBtn from './titleBtn';
-	import os from 'os';
+    import titleBtn from './titleBtn';
 
-	export default {
-		name: 'title-bar',
-		components: { titleBtn },
-		data() {
-			return {
-				platform: os.platform()
-			}
-		},
-	}
+    export default {
+        name: 'title-bar',
+        components: {titleBtn}
+    }
 </script>
 
 <style scoped lang="scss">

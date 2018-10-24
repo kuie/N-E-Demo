@@ -35,6 +35,10 @@ const createRendererWindow = _ => {
             businessWinList.splice(index, 1);
         }
         win = null;
+        /*当全部窗口关闭后主进程自动退出*/
+        if (!businessWinList.length) {
+            mainWindow.close();
+        }
     });
     win.once('ready-to-show', () => win.show());
     win.loadURL(`${winURL}?uuid=${uuid}`);
