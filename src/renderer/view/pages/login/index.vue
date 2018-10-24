@@ -12,22 +12,10 @@
             </Button>
         </FormItem>
         <FormItem>
-            <div>
-                <input v-model="inputSession"/>
-                <Button type="primary" @click="addSession">新增session</Button>
-            </div>
-        </FormItem>
-        <FormItem>
-            <div>
-                {{session}}
-                <Button type="primary" @click="freshSession">更新session</Button>
-            </div>
-        </FormItem>
-        <FormItem>
             <Button type="primary" @click="login">登陆</Button>
         </FormItem>
         <Button @click="addWin">新增窗口</Button>
-        <Button @click="findWin">查询窗口</Button>
+        <Button @click="searchLoginAccount">查询已登录账户</Button>
     </Form>
 </template>
 
@@ -72,7 +60,8 @@
                             this.account.add(accountItem);
                         }
                     });
-                    console.log(this.$router);
+                    /*发送登陆广播*/
+                    api.loginBroadcast(data.id);
                     this.$router.push({name: 'index'});
                 }).catch(e => {
                     console.log(e);
@@ -81,19 +70,12 @@
             },
             selectAccount(user) {
                 this.loginForm.username = user.username;
-
-            },
-            freshSession() {
-                this.session = sessionStorage.getItem('test')
-            },
-            addSession() {
-                sessionStorage.setItem('test', this.inputSession)
             },
             addWin() {
                 api.newBusinessWin();
             },
-            findWin() {
-                api.findWin();
+            searchLoginAccount() {
+                api.searchLoginAccount();
             }
         }
     }

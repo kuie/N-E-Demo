@@ -1,7 +1,6 @@
 const uuidV1 = require('uuid/v1');
-import {
-    app, BrowserWindow, ipcMain, globalShortcut, session, remote, Menu, Tray
-} from 'electron'
+import {app, BrowserWindow, globalShortcut, ipcMain, Menu, remote, session, Tray} from 'electron'
+import {autoUpdater} from 'electron-updater'
 
 /*session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({responseHeaders: `default-src 'none'`})
@@ -23,22 +22,38 @@ const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:9080`
     : `file://${__dirname}/index.html`;
 const createRendererWindow = _ => {
-    let win = new BrowserWindow(wConfig);
     const uuid = uuidV1();
-    win.on('closed', () => win = null);
+    let win = new BrowserWindow(wConfig);
+    win.on('closed', () => {
+        let index = -1;
+        businessWinList.some((item, i) => {
+            if (win === item.win) {
+                index = i;
+            }
+        });
+        if (index >= 0) {
+            businessWinList.splice(index, 1);
+        }
+        win = null;
+    });
     win.once('ready-to-show', () => win.show());
     win.loadURL(`${winURL}?uuid=${uuid}`);
+    /*
+    * id:登陆账户id，用来防止同一账户多次在一个客户端登陆
+    * win:窗口对象
+    * uuid:窗口唯一标识
+    * */
     return {id: null, win, uuid};
 };
 const getWin = uuid => {
-    let win;
+    let target;
     businessWinList.some(item => {
         if (item.uuid === uuid) {
-            win = item.win;
+            target = item;
             return true;
         }
     });
-    return win;
+    return target;
 };
 
 function createWindow() {
@@ -52,12 +67,14 @@ function createWindow() {
         nodeIntegration: false,//禁止node集成
         contextIsolation: true,//上下文隔离
     });
+
+
     ipcMain.on('min', (e, uuid) => {
-        let win = getWin(uuid);
+        let win = getWin(uuid).win;
         win.minimize();
     });
     ipcMain.on('max', (e, uuid) => {
-        let win = getWin(uuid);
+        let win = getWin(uuid).win;
         if (win.isMaximized()) {
             win.unmaximize();
         } else {
@@ -65,10 +82,23 @@ function createWindow() {
         }
     });
     ipcMain.on('close', (e, uuid) => {
-        let win = getWin(uuid);
+        let win = getWin(uuid).win;
         win.close();
     });
     ipcMain.on('newBusinessWin', e => businessWinList.push(createRendererWindow()));
+    ipcMain.on('searchLoginAccount', e => {
+        e.sender.send('searchLoginAccount', businessWinList.filter(v => !!v.id).map(v => v.id));
+    });
+    ipcMain.on('loginBroadcast', (e, arg) => {
+        businessWinList.some(item => {
+            if (arg.uuid === item.uuid) {
+                item.id = arg.accountID
+            }
+        })
+
+    });
+
+
     mainWindow.on('closed', () => mainWindow = null);
     //注册全局快捷键
     globalShortcut.register('F12', () => {
@@ -119,8 +149,6 @@ app.on('activate', () => {
  * support auto updating. Code Signing with a valid certificate is required.
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
-
-import {autoUpdater} from 'electron-updater'
 
 const os = require('os').platform();
 const appVersion = require('../../package.json').version;
