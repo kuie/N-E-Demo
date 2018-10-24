@@ -1,4 +1,7 @@
-import {app, BrowserWindow, ipcMain, globalShortcut, session, remote} from 'electron'
+const uuidV1 = require('uuid/v1');
+import {
+    app, BrowserWindow, ipcMain, globalShortcut, session, remote, Menu, Tray
+} from 'electron'
 
 /*session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({responseHeaders: `default-src 'none'`})
@@ -14,47 +17,72 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
-const businessWinList = {};
+let appIcon = null;
+const businessWinList = [];
+const winURL = process.env.NODE_ENV === 'development'
+    ? `http://localhost:9080`
+    : `file://${__dirname}/index.html`;
+const createRendererWindow = _ => {
+    let win = new BrowserWindow(wConfig);
+    const uuid = uuidV1();
+    win.on('closed', () => win = null);
+    win.once('ready-to-show', () => win.show());
+    win.loadURL(`${winURL}?uuid=${uuid}`);
+    return {id: null, win, uuid};
+};
+const getWin = uuid => {
+    let win;
+    businessWinList.some(item => {
+        if (item.uuid === uuid) {
+            win = item.win;
+            return true;
+        }
+    });
+    return win;
+};
 
 function createWindow() {
-    const winURL = process.env.NODE_ENV === 'development'
-        ? `http://localhost:9080`
-        : `file://${__dirname}/index.html`;
-    console.log(`winURL:${winURL}`);
     /**
      * Initial window options
      */
-    mainWindow = new BrowserWindow(wConfig);
-
-    ipcMain.on('min', (e, win) => {
-        win = win || mainWindow;
-        win.minimize()
+    mainWindow = new BrowserWindow({
+        frame: false,
+        useContentSize: true,//自适应框内内容
+        show: false,
+        nodeIntegration: false,//禁止node集成
+        contextIsolation: true,//上下文隔离
     });
-    ipcMain.on('max', (e, win) => {
-        win = remote.getCurrentWindow;
+    ipcMain.on('min', (e, uuid) => {
+        let win = getWin(uuid);
+        win.minimize();
+    });
+    ipcMain.on('max', (e, uuid) => {
+        let win = getWin(uuid);
         if (win.isMaximized()) {
-            win.unmaximize()
+            win.unmaximize();
         } else {
-            win.maximize()
+            win.maximize();
         }
     });
-    ipcMain.on('close', (e, win) => {
-        win = win || mainWindow;
+    ipcMain.on('close', (e, uuid) => {
+        let win = getWin(uuid);
         win.close();
     });
-    ipcMain.on('newBusinessWin', (e, user) => {
-        if (businessWinList[user.id]) return false;
-        businessWinList[user.id] = new BrowserWindow({parent: mainWindow, show: false});
-        businessWinList[user.id].once('ready-to-show', () => businessWinList[user.id].show());
-        businessWinList[user.id].loadURL('http://localhost:9080');
-    });
-    mainWindow.once('ready-to-show', () => mainWindow.show());
-    mainWindow.loadURL(winURL);
+    ipcMain.on('newBusinessWin', e => businessWinList.push(createRendererWindow()));
     mainWindow.on('closed', () => mainWindow = null);
     //注册全局快捷键
     globalShortcut.register('F12', () => {
         mainWindow.openDevTools();
-    })
+    });
+    businessWinList.push(createRendererWindow());
+
+    let tray = new Tray('G:/N-E-Demo/build/icons/icon.ico');
+    const contextMenu = Menu.buildFromTemplate([
+        {label: 'Item3', type: 'radio', checked: true},
+        {label: 'Item4', type: 'radio'}
+    ]);
+    tray.setToolTip('NEC-Demo');
+    tray.setContextMenu(contextMenu)
 }
 
 app.on('ready', createWindow);
@@ -63,15 +91,18 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
     }
+    if (appIcon) appIcon.destroy()
 });
+
+
 app.setUserTasks([
     {
         program: process.execPath,
-        arguments: '--new-window',
+        // arguments: '--new-window',
         iconPath: process.execPath,
         iconIndex: 0,
-        title: 'New Window',
-        description: 'Create a new window'
+        title: '登陆其他账号',
+        description: '登陆新账号'
     }
 ]);
 

@@ -9,10 +9,11 @@ const baseConfig = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Access-Control-Allow-Origin': '*'
     },
-    method:'POST',
+    method: 'POST',
     query: {_timestamp: Date.now()},
     withCredentials: true, // 上传cookie
-    baseURL: 'http://106.12.100.234:10005/mock/5bc45f7c8ebc42193f2615cf', // 106.12.100.234
+    // baseURL: 'http://106.12.100.234:10005/mock/5bc45f7c8ebc42193f2615cf', // 106.12.100.234 DoClever
+    baseURL: 'http://106.12.100.234:10006/mock/11', // 106.12.100.234 Yapi
     timeout: 30 * 1000// 请求超时时间
 };
 

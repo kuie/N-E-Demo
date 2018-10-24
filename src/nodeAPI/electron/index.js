@@ -1,11 +1,10 @@
 const {ipcRenderer: ipc} = require('electron');
-const obj = {
-    winList: {},
-    windowHandle(type, window) {
-        ipc.send(type, window);
+const uuid = _ => sessionStorage.getItem('uuid');
+module.exports = {
+    windowHandle(type) {
+        ipc.send(type, uuid());
     },
-    newBusinessWin(account) {
-        ipc.send('newBusinessWin', account);
+    newBusinessWin() {
+        ipc.send('newBusinessWin');
     }
 };
-module.exports = obj;

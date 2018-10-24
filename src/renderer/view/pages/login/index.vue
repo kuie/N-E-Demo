@@ -12,8 +12,22 @@
             </Button>
         </FormItem>
         <FormItem>
+            <div>
+                <input v-model="inputSession"/>
+                <Button type="primary" @click="addSession">新增session</Button>
+            </div>
+        </FormItem>
+        <FormItem>
+            <div>
+                {{session}}
+                <Button type="primary" @click="freshSession">更新session</Button>
+            </div>
+        </FormItem>
+        <FormItem>
             <Button type="primary" @click="login">登陆</Button>
         </FormItem>
+        <Button @click="addWin">新增窗口</Button>
+        <Button @click="findWin">查询窗口</Button>
     </Form>
 </template>
 
@@ -30,7 +44,9 @@
                     username: '',
                     password: ''
                 },
-                userList: []
+                userList: [],
+                inputSession: '',
+                session: ''
             }
         },
         mounted() {
@@ -46,8 +62,6 @@
                         lastModify: new Date() - 0,
                         lastToken: data.token
                     };
-                    //打开新窗口
-                    // api.newBusinessWin(accountItem);
                     //以id作为用户唯一标识
                     this.account.where("id").equals(data.id).first(result => {
                         if (result) {
@@ -68,6 +82,18 @@
             selectAccount(user) {
                 this.loginForm.username = user.username;
 
+            },
+            freshSession() {
+                this.session = sessionStorage.getItem('test')
+            },
+            addSession() {
+                sessionStorage.setItem('test', this.inputSession)
+            },
+            addWin() {
+                api.newBusinessWin();
+            },
+            findWin() {
+                api.findWin();
             }
         }
     }

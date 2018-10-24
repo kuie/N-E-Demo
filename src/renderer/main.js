@@ -20,6 +20,8 @@ let unLoginWhiteList = ['/login'];
 router.beforeEach((to, from, next) => {
     //为什么要有这个正则？从第一个页面跳转后请求会在to.poth后面多一个/
     if (!getID()) {
+        let uuid = location.search.replace(/.*\buuid\b=([0-9a-zA-Z-]+).*/, '$1');
+        sessionStorage.setItem('uuid', uuid);
         if (unLoginWhiteList.indexOf(to.path) !== -1) {
             next();
         } else {

@@ -66,3 +66,7 @@ nwjs_urlbase "http://localhost/nwjs/v"
 
 添加electron 安装支持 指定electron 包的安装地址
 详细内容请参看[electron 科学安装](https://www.jianshu.com/p/098fa716581e)
+
+
+多窗口登陆多账户 本地主进程生成UUID后分配给渲染进程
+渲染进程在session中保持uuid 与主进程交互时使用uuid作为窗口唯一凭证
