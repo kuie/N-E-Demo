@@ -79,5 +79,6 @@ exports.setMainEntry = function (type, mode) {
     if (mode === 'development' && type === 'nw') {
         json.window = wConfig;
     }
+    fs.writeFileSync(path.resolve('src', 'nodeApi', 'index.js'), `import obj from './${type}_api';export default obj;`, 'utf-8');
     fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, '  '), 'utf-8');
 };

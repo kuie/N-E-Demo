@@ -1,4 +1,4 @@
-const Package = require('../package');
+const Package = require('../package.json');
 const ops = {
     title: 'App Vue Test',
     appName: Package.build.productName,
@@ -33,7 +33,7 @@ module.exports = {
         manifestUrl: ops.manifestUrl,
         window: {
             title: ops.title,
-            toolbar: false,
+            toolbar: true,
             width: ops.width.default,
             height: ops.height.default,
             min_width: ops.width.min,
@@ -43,7 +43,7 @@ module.exports = {
             kiosk: false,
             show: ops.show,
             icon: ops.iconUrl,
-            show_in_taskbar: true,//是否在任务栏显示图标
+            show_in_taskbar: false,//是否在任务栏显示图标
             fullscreen: ops.fullscreen,
         },
         nodejs: true,

@@ -2,7 +2,7 @@ const {ipcRenderer: ipc} = require('electron');
 const uuid = _ => sessionStorage.getItem('uuid');
 ipc.on('log', (e, arg) => console.log(arg));
 
-const obj = {
+export default {
     /*顶部条基础操作 最大，最小，关闭*/
     windowHandle(type) {
         ipc.send(type, uuid());
@@ -20,5 +20,3 @@ const obj = {
         ipc.send('loginBroadcast', {uuid: uuid(), accountID});
     }
 };
-
-module.exports = obj;

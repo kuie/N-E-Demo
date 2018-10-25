@@ -1,1 +1,1 @@
-export default require('./' + process.env.PLAY_MODE);
+import obj from './nw_api';export default obj;

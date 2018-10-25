@@ -14,7 +14,7 @@
         <FormItem>
             <Button type="primary" @click="login">登陆</Button>
         </FormItem>
-        <Button @click="addWin">新增窗口</Button>
+        <Button type="primary" @click="addWin">新增窗口</Button>
     </Form>
 </template>
 
@@ -71,6 +71,7 @@
                 this.loginForm.username = user.username;
             },
             addWin() {
+                // console.log(api);
                 api.newBusinessWin();
             }
         }

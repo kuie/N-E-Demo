@@ -9,8 +9,8 @@ import db from './utils/DB';
 
 Vue.config.productionTip = false;
 if (process.env.PLAY_MODE === 'nw') {
-    const {checkUpdate} = require('./utils/update');
-    checkUpdate();
+    require('./utils/update').checkUpdate();
+    require('../nodeAPI/nw_api/init.js');
 }
 
 Vue.use(iView, {transfer: true});
