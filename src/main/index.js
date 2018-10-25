@@ -2,6 +2,8 @@ const uuidV1 = require('uuid/v1');
 import {app, BrowserWindow, globalShortcut, ipcMain, Menu, remote, session, Tray} from 'electron'
 import {autoUpdater} from 'electron-updater'
 
+const path = require('path');
+
 /*session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({responseHeaders: `default-src 'none'`})
 });*/
@@ -17,9 +19,10 @@ if (process.env.NODE_ENV !== 'development') {
 
 let appIcon = null;
 const businessWinList = [];
-const winURL = process.env.NODE_ENV === 'development'
-    ? `http://localhost:9080`
-    : `file://${__dirname}/index.html`;
+
+const winURL = process.env.NODE_ENV === 'development' ?
+    `http://localhost:9080` :
+    `file://${__dirname}/index.html`;
 const createRendererWindow = _ => {
     const uuid = uuidV1();
     let win = new BrowserWindow(wConfig);
@@ -33,6 +36,7 @@ const createRendererWindow = _ => {
         });
         if (index >= 0) {
             businessWinList.splice(index, 1);
+            updateIconMenu();
         }
         win = null;
     });
@@ -55,6 +59,19 @@ const getWin = uuid => {
         }
     });
     return target;
+};
+const updateIconMenu = _ => {
+    let MenuList = businessWinList.map(item => {
+        return {
+            label: item.id,
+            click() {
+                item.win.focus();
+            }
+        }
+    });
+    const contextMenu = Menu.buildFromTemplate(MenuList);
+    appIcon.setToolTip('在托盘中的 Electron 示例.');
+    appIcon.setContextMenu(contextMenu)
 };
 
 function createWindow() {
@@ -88,10 +105,10 @@ function createWindow() {
     ipcMain.on('loginBroadcast', (e, arg) => {
         businessWinList.some(item => {
             if (arg.uuid === item.uuid) {
-                item.id = arg.accountID
+                item.id = arg.accountID;
+                updateIconMenu();
             }
         })
-
     });
 
 
@@ -101,13 +118,10 @@ function createWindow() {
     // });
     businessWinList.push(createRendererWindow());
 
-    let tray = new Tray('G:/N-E-Demo/build/icons/icon.ico');
-    const contextMenu = Menu.buildFromTemplate([
-        {label: 'Item3', type: 'radio', checked: true},
-        {label: 'Item4', type: 'radio'}
-    ]);
-    tray.setToolTip('NEC-Demo');
-    tray.setContextMenu(contextMenu)
+    const iconPath = process.env.NODE_ENV === 'development' ?
+        path.resolve(__dirname, '..', '..', 'build', 'icons', 'icon.ico') :
+        `${__static}/icon.ico`;
+    appIcon = new Tray(iconPath);
 }
 
 app.on('ready', createWindow);

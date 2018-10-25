@@ -34,7 +34,7 @@ const actions = {
 
         return new Promise((resolve, reject) => {
             login(account, userInfo.password).then(response => {
-                if (api.searchLoginState()) return reject('账号已登录,请勿重复登陆');
+                // if (api.searchLoginState()) return reject('账号已登录,请勿重复登陆');
                 const data = response.data;
                 const token = data.token;
                 const id = data.id;
