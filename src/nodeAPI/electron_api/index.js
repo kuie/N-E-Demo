@@ -13,6 +13,7 @@ export default {
     },
     /*查询全部窗口*/
     searchLoginState() {
+        /*fixme 这里的UUID 还未存入sessionStorage*/
         return ipc.sendSync('searchLoginState', uuid());
     },
     /*登陆广播*/
