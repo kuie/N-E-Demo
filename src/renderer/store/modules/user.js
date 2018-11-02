@@ -34,11 +34,11 @@ const actions = {
 
         return new Promise((resolve, reject) => {
             login(account, userInfo.password).then(response => {
-                // if (api.searchLoginState()) return reject('账号已登录,请勿重复登陆');
                 const data = response.data;
                 const token = data.token;
                 const id = data.id;
                 /*更新用户登陆列表*/
+                if (api.searchLoginState(id)) return reject('账号已登录,请勿重复登陆');
                 userList.push({account, token, id});
                 sessionStorage.setItem('user_list', JSON.stringify(userList));
                 resolve(data);

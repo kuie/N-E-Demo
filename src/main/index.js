@@ -23,8 +23,21 @@ const businessWinList = [];
 const winURL = process.env.NODE_ENV === 'development' ?
     `http://localhost:9080` :
     `file://${__dirname}/index.html`;
+const updateIconMenu = _ => {
+    let MenuList = businessWinList.map(item => {
+        return {
+            label: item.username,
+            click() {
+                item.win.focus();
+            }
+        }
+    });
+    const contextMenu = Menu.buildFromTemplate(MenuList);
+    appIcon.setToolTip('在托盘中的 Electron 示例.');
+    appIcon.setContextMenu(contextMenu)
+};
+
 const createRendererWindow = _ => {
-    const uuid = uuidV1();
     let win = new BrowserWindow(wConfig);
     /*子窗口关闭事件*/
     win.on('closed', () => {
@@ -41,14 +54,12 @@ const createRendererWindow = _ => {
         win = null;
     });
     /*加载页面后展示页面*/
-    win.once('ready-to-show', () => win.show());
-    win.loadURL(`${winURL}?uuid=${uuid}`);
-    /*
-    * id:登陆账户id，用来防止同一账户多次在一个客户端登陆
-    * win:窗口对象
-    * uuid:窗口唯一标识
-    * */
-    return {id: null, win, uuid};
+    win.once('ready-to-show', () => {
+        win.show(true);
+    });
+    businessWinList.push({id: null, win, uuid: uuidV1(), username: '未登录'});
+    updateIconMenu();
+    win.loadURL(winURL);
 };
 const getWin = uuid => {
     let target;
@@ -60,21 +71,12 @@ const getWin = uuid => {
     });
     return target;
 };
-const updateIconMenu = _ => {
-    let MenuList = businessWinList.map(item => {
-        return {
-            label: item.id,
-            click() {
-                item.win.focus();
-            }
-        }
-    });
-    const contextMenu = Menu.buildFromTemplate(MenuList);
-    appIcon.setToolTip('在托盘中的 Electron 示例.');
-    appIcon.setContextMenu(contextMenu)
-};
 
 function createWindow() {
+    const iconPath = process.env.NODE_ENV === 'development' ?
+        path.resolve(__dirname, '..', '..', 'build', 'icons', 'icon.ico') :
+        `${__static}/icon.ico`;
+    appIcon = new Tray(iconPath);
     ipcMain.on('min', (e, uuid) => {
         let win = getWin(uuid).win;
         win.minimize();
@@ -91,11 +93,11 @@ function createWindow() {
         let win = getWin(uuid).win;
         win.close();
     });
-    ipcMain.on('newBusinessWin', e => businessWinList.push(createRendererWindow()));
-    ipcMain.on('searchLoginState', (e, uuid) => {
+    ipcMain.on('newBusinessWin', e => createRendererWindow());
+    ipcMain.on('searchLoginState', (e, id) => {
         let result = false;
         businessWinList.some(item => {
-            if (item.uuid === uuid) {
+            if (item.id === id) {
                 result = true;
             }
             return result;
@@ -106,29 +108,24 @@ function createWindow() {
         businessWinList.some(item => {
             if (arg.uuid === item.uuid) {
                 item.id = arg.accountID;
+                item.username = arg.username;
                 updateIconMenu();
             }
         })
     });
-
-
+    ipcMain.on('giveMyID', e => e.returnValue = businessWinList[businessWinList.length - 1].uuid);
     //注册全局快捷键
     // globalShortcut.register('F12', () => {
     //     mainWindow.openDevTools();
     // });
-    businessWinList.push(createRendererWindow());
-
-    const iconPath = process.env.NODE_ENV === 'development' ?
-        path.resolve(__dirname, '..', '..', 'build', 'icons', 'icon.ico') :
-        `${__static}/icon.ico`;
-    appIcon = new Tray(iconPath);
+    createRendererWindow();
 }
 
 app.on('ready', createWindow);
 
 app.on('activate', () => {
     if (!businessWinList.length) {
-        businessWinList.push(createRendererWindow());
+        createRendererWindow();
     }
 });
 
