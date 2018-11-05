@@ -10,14 +10,14 @@ import db from './utils/DB';
 Vue.config.productionTip = false;
 if (process.env.PLAY_MODE === 'nw') {
     require('./utils/update').checkUpdate();
-    require('../nodeAPI/nw_api/init.js');
 }
-
+let isPushRouter = false;
 Vue.use(iView, {transfer: true});
 Vue.use(db);
 
 let unLoginWhiteList = ['/login'];
 router.beforeEach((to, from, next) => {
+    console.log(to.path);
     if (!getID()) {
         if (unLoginWhiteList.indexOf(to.path) !== -1) {
             next();
@@ -27,11 +27,14 @@ router.beforeEach((to, from, next) => {
     } else if (to.path === '/login') {
         next('/home');
     } else {
-        router.addRoutes(routers);
-        if (to.path === '/') {
-            next('/home');
+        to.path === '/' && next('/home');
+        if (!isPushRouter) {
+            router.addRoutes(routers);
+            isPushRouter = true;
+            next({...to});
+        } else {
+            next();
         }
-        next()
     }
 });
 router.afterEach(() => {

@@ -24,11 +24,7 @@ export const routers = [
         path: '/home',
         component: Layout,
         children: [
-            {
-                path: '',
-                component: _vue('index'),
-                meta: {title: '首页'},
-            }
+            {path: '', component: _vue('index'), meta: {title: '首页'}}
         ]
     },
     {path: '*', redirect: '/404'}

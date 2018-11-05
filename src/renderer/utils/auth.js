@@ -2,24 +2,19 @@ import Cookies from 'js-cookie';
 
 const TokenKey = 'Account-Token', IdKey = 'Account-Id';
 
-export function getToken() {
-    return Cookies.get(TokenKey);
-}
+export const getToken = _ => sessionStorage.getItem(TokenKey);
 
-export function setToken(token) {
-    return Cookies.set(TokenKey, token);
-}
+export const setToken = token => sessionStorage.setItem(TokenKey, token);
 
-export function getID() {
-    let userList = sessionStorage.getItem('user_list') || '[{"id": false}]';
-    return JSON.parse(userList)[0].id
-}
+export const getID = _ => sessionStorage.getItem(IdKey);
 
-export function setID(id) {
-    return Cookies.set(IdKey, id);
-}
+export const setID = id => sessionStorage.setItem(IdKey, id);
+
+export const setCookie = (key, val) => sessionStorage.setItem(key, val);
+
+export const getCookie = key => sessionStorage.getItem(key);
 
 export function removeCookie() {
-    Cookies.remove(IdKey);
-    Cookies.remove(TokenKey);
+    // Cookies.remove(IdKey);
+    // Cookies.remove(TokenKey);
 }

@@ -27,7 +27,6 @@
         data() {
             return {
                 loginForm: {
-                    id: '测试id',
                     identity: 'clientServer',
                     username: '',
                     password: ''
