@@ -23,6 +23,9 @@ const businessWinList = [];
 const winURL = process.env.NODE_ENV === 'development' ?
     `http://localhost:9080` :
     `file://${__dirname}/index.html`;
+/**
+ * 通过businessWinList 数组更新任务栏Icon 列表
+ * */
 const updateIconMenu = _ => {
     let MenuList = businessWinList.map(item => {
         return {
@@ -36,9 +39,12 @@ const updateIconMenu = _ => {
     appIcon.setToolTip('在托盘中的 Electron 示例.');
     appIcon.setContextMenu(contextMenu)
 };
-
+/**
+ * 生成独立登陆窗口
+ * */
 const createRendererWindow = _ => {
     let win = new BrowserWindow(wConfig);
+    const uuid = uuidV1();
     /*子窗口关闭事件*/
     win.on('closed', () => {
         let index = -1;
@@ -55,12 +61,15 @@ const createRendererWindow = _ => {
     });
     /*加载页面后展示页面*/
     win.once('ready-to-show', () => {
-        win.show(true);
+        win.show();
     });
-    businessWinList.push({id: null, win, uuid: uuidV1(), username: '未登录'});
+    businessWinList.push({id: null, win, uuid, username: '未登录'});
     updateIconMenu();
     win.loadURL(winURL);
 };
+/**
+ * 获取当前窗口
+ * */
 const getWin = uuid => {
     let target;
     businessWinList.some(item => {
@@ -133,7 +142,7 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
     }
-    if (appIcon) appIcon.destroy()
+    // if (appIcon) appIcon.destroy()
 });
 
 app.setJumpList([

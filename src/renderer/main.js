@@ -18,7 +18,6 @@ Vue.use(db);
 
 let unLoginWhiteList = ['/login'];
 router.beforeEach((to, from, next) => {
-    //为什么要有这个正则？从第一个页面跳转后请求会在to.poth后面多一个/
     if (!getID()) {
         if (unLoginWhiteList.indexOf(to.path) !== -1) {
             next();
@@ -26,7 +25,6 @@ router.beforeEach((to, from, next) => {
             next('/login');
         }
     } else if (to.path === '/login') {
-        /*修改路由*/
         next('/home');
     } else {
         router.addRoutes(routers);
@@ -34,7 +32,6 @@ router.beforeEach((to, from, next) => {
             next('/home');
         }
         next()
-
     }
 });
 router.afterEach(() => {

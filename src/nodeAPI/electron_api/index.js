@@ -2,7 +2,7 @@ const {ipcRenderer: ipc} = require('electron');
 const uuidV1 = require('uuid/v1');
 const uuid = _ => sessionStorage.getItem('uuid');
 //回话持久化uuid
-!uuid() && sessionStorage.setItem('uuid', ipc.send('giveMyID'));
+!uuid() && sessionStorage.setItem('uuid', ipc.sendSync('giveMyID'));
 ipc.on('log', (e, arg) => console.log(arg));
 
 export default {

@@ -16,7 +16,7 @@ const ops = {
     resizable: true,
     iconUrl: "/static/logo.png",
     frame: false,//边框模式
-    show: true,//启动即展示页面
+    show: false,//启动即展示页面
     cache: false,//页面缓存
     fullscreen: false,//全屏
     'always-on-top': false,//置顶
