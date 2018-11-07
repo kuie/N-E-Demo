@@ -27,33 +27,26 @@ if (!sessionStorage.getItem('uuid')) {
     }
 }
 const uuid = sessionStorage.getItem('uuid');
+/*子窗口构造器*/
+const createWin = _ => {
+    nw.Window.open(url, {}, function (win) {
+        /*生成新的uuid并放入win对象*/
+        win.window.uuidX = uuidV1();
+    });
+};
 /*主窗口判断*/
 const isMainWindow = sessionStorage.getItem('isMainWindow');
 let port = chrome.runtime.connect();
 
-/*
-* postMessage 数据结构
-* {
-*   from:uuid//发送者uuid,
-*   to:uuid2//收件人 uuid或all(默认)
-*   type:0,//1:res相应  或  0:req请求
-*   title:'updateWinState'//指定请求归属类型
-*   data:{//数据体
-*       id:'111',//用户id
-*       username:'封鬼',//用户名称
-*       ...
-*   }
-* }
-* */
-
+/*postMessage 构造器*/
 class sendTemplate {
     constructor(obj) {
         this.from = uuid;//发送者uuid
         this.to = obj.to || '*';//接收者uuid或"*"或"main"
-        this.type = obj.type || 1;
-        this.needResponse = obj.needResponse || 0;
-        this.title = obj.title || false;
-        this.winType = obj.winType || 'child';
+        this.type = obj.type || 1;//1:res相应  或  0:req请求
+        this.needResponse = obj.needResponse || 0;//0:不需要回复，1:需要回复
+        this.title = obj.title || false;//指定请求标题
+        this.winType = obj.winType || 'child';//发送者类型 'main'（主进程）\'child'（子进程）
         const getObjData = obj => {
             const flagOrg = {};
             for (const key in obj) {
@@ -62,7 +55,7 @@ class sendTemplate {
                 }
             }
             return flagOrg;
-        };
+        };//整合数据体
         this.data = obj.data ? obj.data : getObjData(obj);
     }
 }
@@ -78,11 +71,7 @@ if (isMainWindow) {
         menu.append(new nw.MenuItem({
             type: 'normal',
             label: '新建窗口',
-            click: () => {
-                nw.Window.open(url, {}, function (win) {
-                    win.window.uuidX = uuidV1();
-                });
-            }
+            click: () => createWin()
         }));
         businessWinList.forEach(item => {
             menu.append(new nw.MenuItem({
@@ -109,17 +98,7 @@ if (isMainWindow) {
         }));
         tray.menu = menu;
     };
-    /*子窗口构造器*/
-    const createWin = _ => {
-        nw.Window.open(url, {}, function (win) {
-            /*生成新的uuid并放入win对象*/
-            const childUuid = uuidV1();
-            win.window.uuidX = childUuid;
-            // win.window.selfWin = win;
-            businessWinList.push({uuid: childUuid, id: null, username: ''});
-            updateIconMenu();
-        });
-    };
+
     //runtime监听
     chrome.runtime.onConnect.addListener(function (childPort) {
         childPort.onMessage.addListener(ctx => {
@@ -182,12 +161,7 @@ const childHandleObject = {
         }
     },
     /*新建窗口*/
-    newBusinessWin() {
-        nw.Window.open(url, {}, function (win) {
-            /*生成新的uuid并放入win对象*/
-            win.window.uuidX = uuidV1();
-        });
-    },
+    newBusinessWin: _ => createWin(),
     sendMsg(msg) {
         console.log(msg);
     },
