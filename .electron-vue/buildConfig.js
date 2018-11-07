@@ -1,7 +1,8 @@
 const Package = require('../package.json');
+const appName = require('../electron-builder').productName;
 const ops = {
     title: 'App Vue Test',
-    appName: Package.build.productName,
+    appName,
     width: {
         default: 800,
         max: 800,
@@ -33,7 +34,7 @@ module.exports = {
         manifestUrl: ops.manifestUrl,
         window: {
             title: ops.title,
-            toolbar: true,
+            toolbar: false,
             width: ops.width.default,
             height: ops.height.default,
             min_width: ops.width.min,
@@ -43,7 +44,7 @@ module.exports = {
             kiosk: false,
             show: ops.show,
             icon: ops.iconUrl,
-            show_in_taskbar: false,//是否在任务栏显示图标
+            show_in_taskbar: true,//是否在任务栏显示图标
             fullscreen: ops.fullscreen,
         },
         nodejs: true,

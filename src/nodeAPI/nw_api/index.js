@@ -1,14 +1,3 @@
-/**
- * 业务逻辑
- *
- * 1.广播询问是否存在主窗口
- *
- * 2.true  => 成为主窗口
- *
- * 2.false => 注册子窗口
- *
- * 3.展开业务逻辑
- * */
 import {getCookie} from "../../renderer/utils/auth";
 
 const url = require('../../../package.json').main;
@@ -27,13 +16,10 @@ if (!sessionStorage.getItem('uuid')) {
     }
 }
 const uuid = sessionStorage.getItem('uuid');
-/*子窗口构造器*/
-const createWin = _ => {
-    nw.Window.open(url, {}, function (win) {
-        /*生成新的uuid并放入win对象*/
-        win.window.uuidX = uuidV1();
-    });
-};
+/* 子窗口构造器
+ * 生成新的uuid并放入win对象
+ * */
+const createWin = _ => nw.Window.open(url, {}, win => win.window.uuidX = uuidV1());
 /*主窗口判断*/
 const isMainWindow = sessionStorage.getItem('isMainWindow');
 let port = chrome.runtime.connect();
@@ -66,13 +52,22 @@ if (isMainWindow) {
     //任务栏图标
     const tray = new nw.Tray({title: '侧边栏', icon: 'static/logo.png'});
     /*任务栏图标，创建*/
+    const createWinBtn = new nw.MenuItem({
+        type: 'normal',
+        label: '新建窗口',
+        click: () => createWin()
+    });
+    const quitBtn = new nw.MenuItem({
+        type: 'normal',
+        label: '退出',
+        click: () => {
+            nw.App.closeAllWindows();
+            nw.App.quit();
+        }
+    });
     const updateIconMenu = _ => {
         let menu = nw.Menu();
-        menu.append(new nw.MenuItem({
-            type: 'normal',
-            label: '新建窗口',
-            click: () => createWin()
-        }));
+        menu.append(createWinBtn);
         businessWinList.forEach(item => {
             menu.append(new nw.MenuItem({
                 type: 'normal',
@@ -88,17 +83,10 @@ if (isMainWindow) {
                 }
             }));
         });
-        menu.append(new nw.MenuItem({
-            type: 'normal',
-            label: '退出',
-            click: () => {
-                nw.App.closeAllWindows();
-                nw.App.quit();
-            }
-        }));
+        menu.append(quitBtn);
         tray.menu = menu;
     };
-
+    nw.Window.get().on('close', () => nw.App.quit());
     //runtime监听
     chrome.runtime.onConnect.addListener(function (childPort) {
         childPort.onMessage.addListener(ctx => {
@@ -129,6 +117,7 @@ if (isMainWindow) {
     });
     createWin();
     /*因为任务栏只可以在主进程中使用所以 主进程隐藏窗口并保持不可刷新状态*/
+
     nw.Window.get().hide();
 } else {
     nw.Window.get().on('close', function () {

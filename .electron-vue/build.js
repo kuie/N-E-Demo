@@ -65,9 +65,7 @@ function nw() {
             console.error(`\n${err}\n`);
             process.exit(1);
         })
-        .then(manifest => {
-            return require('./nw/build-upgrade')(manifest);
-        })
+        .then(manifest => require('./nw/build-upgrade')(manifest))
         .catch(err => {
             m.error('renderer');
             console.log(`\n  ${errorLog}failed to build build-nw process`);
@@ -80,12 +78,12 @@ function nw() {
             console.error(`\n${err}\n`);
             process.exit(1);
         });
-
 }
 
 function clean() {
     del.sync(['build/*', '!build/icons', '!build/icons/icon.*']);
     console.log(`\n${doneLog}\n`);
+
     process.exit();
 }
 

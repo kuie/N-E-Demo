@@ -10,7 +10,6 @@ import db from './utils/DB';
 Vue.config.productionTip = false;
 if (process.env.PLAY_MODE === 'nw') {
     require('./utils/update').checkUpdate();
-    /*判断是否为主窗口*/
 }
 let isPushRouter = false;
 Vue.use(iView, {transfer: true});
