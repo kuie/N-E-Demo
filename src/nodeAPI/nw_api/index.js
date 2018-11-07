@@ -118,6 +118,12 @@ if (isMainWindow) {
                     });
                     isNewWin && businessWinList.push({uuid: ctx.from, id: data.id, username: data.username});
                     updateIconMenu();
+                    break;
+                case 'winClose':
+                    console.log(ctx);
+                    businessWinList = businessWinList.filter(item => item.uuid !== ctx.from);
+                    updateIconMenu();
+                    break;
             }
         });
     });
@@ -125,6 +131,11 @@ if (isMainWindow) {
     /*因为任务栏只可以在主进程中使用所以 主进程隐藏窗口并保持不可刷新状态*/
     nw.Window.get().hide();
 } else {
+    nw.Window.get().on('close', function () {
+        let port = chrome.runtime.connect();
+        port.postMessage(new sendTemplate({to: 'main', title: 'winClose'}));
+        setTimeout(_ => this.close(true), 0);
+    });
     /*接受主进程发送来的消息*/
     chrome.runtime.onConnect.addListener(function (childPort) {
         childPort.onMessage.addListener(ctx => {
@@ -140,11 +151,7 @@ if (isMainWindow) {
         });
     });
 
-    port.postMessage(new sendTemplate({
-        to: 'main',
-        winType: 'child',
-        title: 'updateWinState',//指定请求归属类型
-    }));
+    port.postMessage(new sendTemplate({to: 'main', title: 'updateWinState'}));
 }
 /*操作功能区*/
 const childHandleObject = {

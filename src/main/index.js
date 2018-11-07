@@ -26,6 +26,14 @@ const winURL = process.env.NODE_ENV === 'development' ?
 /**
  * 通过businessWinList 数组更新任务栏Icon 列表
  * */
+let createWinBtn = {
+    label: '新建窗口',
+    click: _ => createRendererWindow()
+};
+let quitBtn = {
+    label: '退出',
+    click: _ => app.quit()
+};
 const updateIconMenu = _ => {
     let MenuList = businessWinList.map(item => {
         return {
@@ -35,8 +43,10 @@ const updateIconMenu = _ => {
             }
         }
     });
+    MenuList.unshift(createWinBtn);
+    MenuList.push(quitBtn);
     const contextMenu = Menu.buildFromTemplate(MenuList);
-    appIcon.setToolTip('在托盘中的 Electron 示例.');
+    appIcon.setToolTip('多任务管理');
     appIcon.setContextMenu(contextMenu)
 };
 /**
@@ -46,19 +56,20 @@ const createRendererWindow = _ => {
     let win = new BrowserWindow(wConfig);
     const uuid = uuidV1();
     /*子窗口关闭事件*/
-    win.on('closed', () => {
+    win.on('close', () => {
         let index = -1;
         businessWinList.some((item, i) => {
             if (win === item.win) {
                 index = i;
+                return true;
             }
         });
         if (index >= 0) {
             businessWinList.splice(index, 1);
             updateIconMenu();
         }
-        win = null;
     });
+    win.on('closed', () => win = null);
     /*加载页面后展示页面*/
     win.once('ready-to-show', () => {
         win.show();
@@ -81,7 +92,7 @@ const getWin = uuid => {
     return target;
 };
 
-function createWindow() {
+function createMain() {
     const iconPath = process.env.NODE_ENV === 'development' ?
         path.resolve(__dirname, '..', '..', 'build', 'icons', 'icon.ico') :
         `${__static}/icon.ico`;
@@ -118,6 +129,7 @@ function createWindow() {
             if (arg.uuid === item.uuid) {
                 item.id = arg.accountID;
                 item.username = arg.username;
+                console.log(item);
                 updateIconMenu();
             }
         })
@@ -130,7 +142,7 @@ function createWindow() {
     createRendererWindow();
 }
 
-app.on('ready', createWindow);
+app.on('ready', createMain);
 
 app.on('activate', () => {
     if (!businessWinList.length) {

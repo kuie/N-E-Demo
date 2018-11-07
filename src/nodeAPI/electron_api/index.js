@@ -1,5 +1,6 @@
+import {getCookie} from "../../renderer/utils/auth";
+
 const {ipcRenderer: ipc} = require('electron');
-const uuidV1 = require('uuid/v1');
 const uuid = _ => sessionStorage.getItem('uuid');
 //回话持久化uuid
 !uuid() && sessionStorage.setItem('uuid', ipc.sendSync('giveMyID'));
@@ -26,6 +27,6 @@ export default {
     },
     /*登陆广播*/
     loginBroadcast(accountID) {
-        ipc.send('loginBroadcast', {uuid: uuid(), accountID});
+        ipc.send('loginBroadcast', {uuid: uuid(), accountID, username: getCookie('username')});
     }
 };
