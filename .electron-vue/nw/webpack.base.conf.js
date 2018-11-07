@@ -2,6 +2,7 @@ const path = require('path');
 const utils = require('../utils');
 const config = require('./config');
 const vueLoaderConfig = require('../vue-loader.conf');
+
 // const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 function resolve(dir) {
@@ -27,14 +28,6 @@ module.exports = {
     },
     module: {
         rules: [
-            // {
-            //     test: /\.css$/,
-            //     use: ExtractTextPlugin.extract({
-            //         fallback: 'style-loader',
-            //         use: ['css-loader', 'postcss-loader']
-            //
-            //     })
-            // },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
