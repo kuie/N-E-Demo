@@ -1,8 +1,8 @@
 const Package = require('../package.json');
-const appName = require('../electron-builder').productName;
+// const appName = require('../electron-builder').productName;
 const ops = {
     title: 'App Vue Test',
-    appName,
+    appName: Package.build.productName,
     width: {
         default: 800,
         max: 800,
