@@ -36,7 +36,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 use: 'babel-loader',
-                exclude: [/node_modules/, resolve('../src/main/')]
+                exclude: [/node_modules/, resolve('../src/main/electron.js'),resolve('../src/main/electron.dev.js')]
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
