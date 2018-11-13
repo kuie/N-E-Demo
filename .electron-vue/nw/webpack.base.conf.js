@@ -12,7 +12,8 @@ function resolve(dir) {
 const src = resolve(path.join('..', 'src', 'renderer'));
 module.exports = {
     entry: {
-        app: './src/renderer/main.js'
+        app: './src/renderer/main.js',
+        main: './src/main/nw.js'
     },
     output: {
         path: config.build.assetsRoot,
@@ -36,14 +37,14 @@ module.exports = {
             {
                 test: /\.js$/,
                 use: 'babel-loader',
-                exclude: [/node_modules/, resolve('../src/main/electron.js'),resolve('../src/main/electron.dev.js')]
+                exclude: [/node_modules/]
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
                 loader: 'url-loader',
                 query: {
                     limit: 10000,
-                    name: utils.assetsPath('imgs/[name].[hash:7].[ext]')
+                    name: utils.assetsPath('imgs/[name]--[folder].[ext]')
                 }
             },
             {
@@ -51,7 +52,7 @@ module.exports = {
                 loader: 'url-loader',
                 query: {
                     limit: 10000,
-                    name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
+                    name: utils.assetsPath('fonts/[name]--[folder].[ext]')
                 }
             }
         ]

@@ -8,7 +8,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
-
+const nodeModulesPath = path.join(__dirname, '../../node_modules');
+const nodeModulesPathReg = new RegExp(`^${nodeModulesPath.replace(/\\/g, '\\\\')}.*\\.js$`);
 const env = config.build.env;
 
 const webpackConfig = merge(baseWebpackConfig, {
@@ -21,58 +22,45 @@ const webpackConfig = merge(baseWebpackConfig, {
     devtool: config.build.productionSourceMap ? '#source-map' : false,
     output: {
         path: config.build.assetsRoot,
-        filename: utils.assetsPath('[name].[chunkhash].js',),
-        chunkFilename: utils.assetsPath('[id].[chunkhash].js',),
+        filename: utils.assetsPath('[name].js',),
+        chunkFilename: utils.assetsPath('[id].js',),
     },
     plugins: [
-        // http://vuejs.github.io/vue-loader/en/workflow/production.html
+        //环境变量控制
         new webpack.DefinePlugin({
             'process.env': env
         }),
-        /*导致打包错误，原因不明*/
-        // new webpack.optimize.UglifyJsPlugin({
-        //     compress: {
-        //         warnings: false
-        //     },
-        //     sourceMap: true
-        // }),
-        // extract css into its own file
+        //样式文件抽离
         new ExtractTextPlugin({
-            filename: utils.assetsPath('[name].[contenthash].css')
+            filename: utils.assetsPath('[name].css')
         }),
-        // Compress extracted CSS. We are using this plugin so that possible
-        // duplicated CSS from different components can be deduped.
+        //样式文件压缩
         new OptimizeCSSPlugin(),
-        // generate dist index.html with correct asset hash for caching.
-        // you can customize output by editing /index.html
-        // see https://github.com/ampedandwired/html-webpack-plugin
+        // 构建index.html文件
         new HtmlWebpackPlugin({
-            filename: config.build.index,
-            template: 'index.html',
+            filename: 'index.html',
+            template: path.resolve(__dirname, '../../index.html'),
+            //注入js脚本连接
             inject: true,
+            //压缩控制
             minify: {
-                removeComments: true,
                 collapseWhitespace: true,
+                removeComments: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                useShortDoctype: true,
                 removeAttributeQuotes: true
-                // more options:
-                // https://github.com/kangax/html-minifier#options-quick-reference
             },
             // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-            chunksSortMode: 'dependency'
+            chunksSortMode: 'dependency',
+            //不引入main.js 主进程启动入口仅供nw.js启动主进程
+            excludeChunks: ['main']
         }),
-        // split vendor js into its own file
+        // 拆分 node_modules下的文件
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
-            minChunks: function (module, count) {
-                // any required modules inside node_modules are extracted to vendor
-                return (
-                    module.resource &&
-                    /\.js$/.test(module.resource) &&
-                    module.resource.indexOf(
-                        path.join(__dirname, '../../node_modules')
-                    ) === 0
-                )
-            }
+            minChunks: (module, count) => nodeModulesPathReg.test(module.resource)
         }),
         // extract webpack runtime and module manifest to its own file in order to
         // prevent vendor hash from being updated whenever app bundle is updated
@@ -80,14 +68,19 @@ const webpackConfig = merge(baseWebpackConfig, {
             name: 'manifest',
             chunks: ['vendor']
         }),
-        // copy custom static assets
+        // 静态资源拷贝
         new CopyWebpackPlugin([
             {
                 from: path.join(__dirname, '../../static'),
                 to: path.join(__dirname, '../../dist/nw/static'),
                 ignore: ['.*']
             }
-        ])
+        ]),
+        //压缩js
+        new webpack.optimize.UglifyJsPlugin({
+            exclude: ['vendor'],
+            sourceMap: true
+        })
     ]
 });
 

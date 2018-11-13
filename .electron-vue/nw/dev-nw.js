@@ -3,17 +3,10 @@ const path = require('path');
 const fs = require('fs');
 const nwPath = require('nw').findpath();
 const rootPath = require('./rootPath');
-const packageJsonPath = path.resolve('./package.json');
 
 module.exports = runNwDev;
 
-function runNwDev(uri = '') {
-    if (uri && (uri + '').trim()) {
-        tmpJson = require(packageJsonPath);
-        tmpJson.main = uri;
-        fs.writeFileSync(packageJsonPath, JSON.stringify(tmpJson, null, '  '), 'utf-8');
-    }
-
+function runNwDev() {
     let closed;
     let nwDev = exec(nwPath + ' ' + rootPath, {cwd: rootPath}, function (err, stdout, stderr) {
         process.exit(0);

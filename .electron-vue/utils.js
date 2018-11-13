@@ -4,15 +4,11 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const wConfig = require('./buildConfig').nw.window;
 
 exports.assetsPath = function (_path) {
-    const assetsSubDirectory = process.env.NODE_ENV === 'production'
-        ? './'
-        : '../../';
+    const assetsSubDirectory = process.env.NODE_ENV === 'production' ? './' : '../../';
     return path.posix.join(assetsSubDirectory, _path);
 };
 
-exports.cssLoaders = function (options) {
-    options = options || {};
-
+exports.cssLoaders = function (options = {}) {
     const cssLoader = {
         loader: 'css-loader',
         options: {
@@ -75,7 +71,7 @@ exports.setMainEntry = function (type, mode) {
     if (!/^(nw|electron|web)$/.test(type)) return false;
     const packageJsonPath = path.resolve('./', 'package.json');
     let json = JSON.parse(fs.readFileSync(packageJsonPath).toString());
-    json.main = type === 'nw' ? 'http://localhost:8080' : './dist/electron/main.js';
+    json.main = `./dist/${type}/main.js`;
     if (mode === 'development' && type === 'nw') {
         json.window = wConfig;
     }

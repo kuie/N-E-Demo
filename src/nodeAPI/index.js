@@ -1,1 +1,1 @@
-import obj from './electron_api';export default obj;
+import obj from './nw_api';export default obj;

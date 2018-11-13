@@ -4,6 +4,18 @@
   "directories": {
     "output": "build/electron"
   },
+  "nsis": {
+    "oneClick": false,
+    "allowElevation": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "./build/icons/icon.ico",
+    "uninstallerIcon": "./build/icons/icon.ico",
+    "installerHeaderIcon": "./build/icons/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "测试"
+  },
+  "copyright": "faf",
   "files": [
     "dist/electron/**/*"
   ],
@@ -26,7 +38,12 @@
     "icon": "build/icons/icon.icns"
   },
   "win": {
-    "icon": "build/icons/icon.ico"
+    "icon": "build/icons/icon.ico",
+    "target": [
+      {
+        "target": "nsis"
+      }
+    ]
   },
   "linux": {
     "icon": "build/icons"

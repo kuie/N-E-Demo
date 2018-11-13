@@ -92,17 +92,41 @@ let rendererConfig = {
     },
     plugins: [
         new ExtractTextPlugin('styles.css'),
+
+        /*// 构建index.html文件
         new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: path.resolve(__dirname, '../src/index.ejs'),
+            filename: config.build.index,
+            template: 'index.html',
+            //注入js脚本连接
+            inject: true,
+            //压缩控制
             minify: {
                 collapseWhitespace: true,
-                removeAttributeQuotes: true,
-                removeComments: true
+                removeComments: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                useShortDoctype: true,
+                removeAttributeQuotes: true
             },
-            nodeModules: process.env.NODE_ENV !== 'production'
-                ? path.resolve(__dirname, '../node_modules')
-                : false
+            // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+            chunksSortMode: 'dependency',
+            //不引入main.js 主进程启动入口仅供nw.js启动主进程
+            excludeChunks: ['main']
+        }),*/
+
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: path.resolve(__dirname, '../index.html'),
+            minify: {
+                collapseWhitespace: true,
+                removeComments: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                useShortDoctype: true,
+                removeAttributeQuotes: true
+            },
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin()

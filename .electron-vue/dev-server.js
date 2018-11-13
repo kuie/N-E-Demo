@@ -87,6 +87,6 @@ module.exports = app.listen(port, function (err) {
 
     // when env is testing, don't need open it
     if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
-        require('./nw/dev-nw')(uri);
+        require('./nw/dev-nw')();
     }
 });
