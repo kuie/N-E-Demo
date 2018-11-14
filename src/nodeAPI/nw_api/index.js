@@ -45,8 +45,6 @@ chrome.runtime.onConnect.addListener(function (childPort) {
         if (ctx.to !== uuid && ctx.to !== '*') return false;
         const data = ctx.data;
         switch (ctx.title) {
-            case 'getFocus':
-                return nw.Window.get().focus();
             default:
                 return false;
         }

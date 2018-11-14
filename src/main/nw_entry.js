@@ -9,6 +9,7 @@ const createWin = _ => nw.Window.open(baseUrl, {
     icon: '/static/logo.png',
 }, win => {
     win.window.sessionStorage.setItem('uuid', win.frameId);
+    businessWinList.push({uuid: win.frameId, id: '', username: '', win});
 });
 
 /*postMessage 构造器*/
@@ -34,7 +35,16 @@ class sendTemplate {
 }
 
 let businessWinList = [];
-
+const getWin = uuid => {
+    let win = null;
+    businessWinList.some(w => {
+        if (uuid === w.uuid) {
+            win = w.win;
+            return true;
+        }
+    });
+    return win;
+};
 //任务栏图标
 const tray = new nw.Tray({title: '侧边栏', icon: 'static/logo.png'});
 /*任务栏图标，创建*/
@@ -60,14 +70,7 @@ const updateIconMenu = _ => {
             label: item.username || '新窗口',
             uuid: item.uuid,
             id: item.id,
-            click: () => {
-                console.log(item.uuid);
-                let port = chrome.runtime.connect();
-                port.postMessage(new sendTemplate({
-                    title: 'getFocus',
-                    to: item.uuid
-                }))
-            }
+            click: () => getWin(item.uuid).focus()
         }));
     });
     menu.append(quitBtn);
@@ -90,7 +93,6 @@ chrome.runtime.onConnect.addListener(function (childPort) {
                         return true;
                     }
                 });
-                isNewWin && businessWinList.push({uuid: ctx.from, id: data.id, username: data.username});
                 updateIconMenu();
                 break;
             case 'winClose':

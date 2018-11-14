@@ -37,6 +37,7 @@
         },
         mounted() {
             this.account.toArray().then(arr => this.userList = arr);
+            console.log(businessWinList);
         },
         methods: {
             login() {
