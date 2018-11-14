@@ -30,7 +30,7 @@ module.exports = {
         version: Package.version,
         description: Package.description,
         author: Package.author,
-        main: "index.html",
+        main: "./main.js",
         manifestUrl: ops.manifestUrl,
         window: {
             title: ops.title,
@@ -45,7 +45,7 @@ module.exports = {
             show: ops.show,
             icon: ops.iconUrl,
             show_in_taskbar: true,//是否在任务栏显示图标
-            fullscreen: ops.fullscreen,
+            fullscreen: ops.fullscreen
         },
         nodejs: true,
         "js-flags": "--harmony",

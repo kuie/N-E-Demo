@@ -10,7 +10,7 @@ const BabiliWebpackPlugin = require('babel-minify-webpack-plugin')
 
 let mainConfig = {
     entry: {
-        main: path.join(__dirname, '../src/main/electron.js')
+        main: path.join(__dirname, '../src/main/electron_entry.js')
     },
     externals: [
         ...Object.keys(dependencies || {})

@@ -13,7 +13,7 @@ const src = resolve(path.join('..', 'src', 'renderer'));
 module.exports = {
     entry: {
         app: './src/renderer/main.js',
-        main: './src/main/nw.js'
+        main: './src/main/nw_entry.js'
     },
     output: {
         path: config.build.assetsRoot,

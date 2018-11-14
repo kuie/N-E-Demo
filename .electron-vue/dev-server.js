@@ -44,9 +44,7 @@ compiler.plugin('compilation', function (compilation) {
 // proxy api requests
 Object.keys(proxyTable).forEach(function (context) {
     let options = proxyTable[context];
-    if (typeof options === 'string') {
-        options = {target: options}
-    }
+    if (typeof options === 'string') options = {target: options};
     app.use(proxyMiddleware(options.filter || context, options))
 });
 
@@ -68,7 +66,6 @@ app.use(staticPath, express.static('./static'));
 const upgrade = config.dev.upgrade;
 if (upgrade && upgrade.publicPath && upgrade.directory) {
     app.use(upgrade.publicPath, [function (req, res, next) {
-        // console.log(req.url, JSON.stringify(req.headers));
         next()
     }, express.static(upgrade.directory)]);
 }
@@ -79,14 +76,7 @@ devMiddleware.waitUntilValid(function () {
     console.log('> Listening at ' + uri + '\n');
 });
 
-module.exports = app.listen(port, function (err) {
-    if (err) {
-        console.log(err);
-        return
-    }
-
-    // when env is testing, don't need open it
-    if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
-        require('./nw/dev-nw')();
-    }
+module.exports = app.listen(port, err => {
+    if (err) console.log(err);
+    else autoOpenBrowser && require('./nw/dev-nw')();
 });

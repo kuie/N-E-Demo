@@ -22,7 +22,7 @@
         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
       },
       "runtimeArgs": [
-        "${workspaceRoot}/src/main/electron.js",
+        "${workspaceRoot}/src/main/electron_entry.js",
         "--remote-debugging-port=9222"
       ],
       "webRoot": "${workspaceRoot}/src"

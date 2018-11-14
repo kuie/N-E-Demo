@@ -1,20 +1,11 @@
 import {getCookie} from "../../renderer/utils/auth";
 
-const url = require('../../../package.json').main;
 const wConfig = JSON.parse(JSON.stringify(require('../../../.electron-vue/buildConfig').nw.window));
 wConfig.setShowInTaskbar = wConfig.show_in_taskbar;
 delete wConfig.show_in_taskbar;
 
 /*有uuid 就使用session中的uuid 没有就检查window对象上是否挂载了uuidX 都没有就生成uuid*/
-const uuidV1 = require('uuid/v1');
-if (!sessionStorage.getItem('uuid')) {
-    try {
-        sessionStorage.setItem('uuid', uuidX);
-    } catch (err) {
-        sessionStorage.setItem('uuid', uuidV1());
-        sessionStorage.setItem('isMainWindow', true);
-    }
-}
+if (!sessionStorage.getItem('uuid')) sessionStorage.setItem('uuid', uuidX);
 const uuid = sessionStorage.getItem('uuid');
 let port = chrome.runtime.connect();
 
@@ -77,8 +68,6 @@ export default {
                 return win.close();
         }
     },
-    /*新建窗口*/
-    newBusinessWin: _ => console.log('发送新增窗口请求'),
     sendMsg(msg) {
         console.log(msg);
     },
