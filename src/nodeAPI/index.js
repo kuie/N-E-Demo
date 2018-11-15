@@ -1,1 +1,1 @@
-import obj from './nw_api';export default obj;
+import api from './nw_api';export default {install(Vue) {Vue.prototype.$api = api;}};

@@ -20,7 +20,6 @@
 
 <script>
     import store from '../../../store'
-    import api from '../../../../nodeAPI';
 
     export default {
         data() {
@@ -37,7 +36,6 @@
         },
         mounted() {
             this.account.toArray().then(arr => this.userList = arr);
-            console.log(businessWinList);
         },
         methods: {
             login() {
@@ -60,7 +58,7 @@
                         }
                     });
                     /*发送登陆广播*/
-                    api.loginBroadcast(data.id);
+                    this.$api.loginBroadcast(data.id);
                     this.$router.push({name: 'index'});
                 }).catch(e => {
                     console.log(e);
@@ -71,7 +69,7 @@
                 this.loginForm.username = user.username;
             },
             sendMsg() {
-                api.sendMsg(new Date().toString());
+                this.$api.sendMsg(new Date().toString());
             }
         }
     }

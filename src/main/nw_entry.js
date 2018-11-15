@@ -1,3 +1,4 @@
+require('./update').checkUpdate();
 const baseUrl = 'http://localhost:8080';
 const createWin = _ => nw.Window.open(baseUrl, {
     width: 800,
@@ -11,6 +12,8 @@ const createWin = _ => nw.Window.open(baseUrl, {
     win.window.sessionStorage.setItem('uuid', win.frameId);
     businessWinList.push({uuid: win.frameId, id: '', username: '', win});
 });
+
+let businessWinList = [];
 
 /*postMessage 构造器*/
 class sendTemplate {
@@ -34,7 +37,10 @@ class sendTemplate {
     }
 }
 
-let businessWinList = [];
+// businessWinList.prototype.push = (item => {
+//     Array.push.call(item);
+//     updateIconMenu();
+// });
 const getWin = uuid => {
     let win = null;
     businessWinList.some(w => {

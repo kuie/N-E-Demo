@@ -3,8 +3,6 @@
 </template>
 
 <script>
-    import api from '../../../nodeAPI';
-
     const style = {
         min: {
             backgroundColor: 'green',
@@ -20,7 +18,7 @@
         }
     };
     export default {
-        name: 'Titlebtn',
+        name: 'titleBtn',
         props: {
             type: {
                 type: String,
@@ -34,7 +32,7 @@
         },
         methods: {
             click() {
-                api.windowHandle(this.type);
+                this.$api.windowHandle(this.type);
             }
         }
     }

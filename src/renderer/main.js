@@ -6,14 +6,13 @@ import App from './App'
 import router, {routers} from './router'
 import store from './store'
 import db from './utils/DB';
+import api from '../nodeAPI';
 
-Vue.config.productionTip = false;
-if (process.env.PLAY_MODE === 'nw') {
-    require('./utils/update').checkUpdate();
-}
 let isPushRouter = false;
+Vue.config.productionTip = false;
 Vue.use(iView, {transfer: true});
 Vue.use(db);
+Vue.use(api);
 
 let unLoginWhiteList = ['/login'];
 router.beforeEach((to, from, next) => {
