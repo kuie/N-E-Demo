@@ -20,10 +20,7 @@ export default {
         return ipc.sendSync('searchLoginState', id);
     },
     sendMsg(msg) {
-        console.log(msg);
-        console.log(ipc.sendSync('searchLoginState', uuid()));
-        // console.log(businessWinList);
-        // port.postMessage('test')
+
     },
     /*登陆广播*/
     loginBroadcast(accountID) {

@@ -1,4 +1,4 @@
-import {removeCookie, setToken, setID, setCookie} from "../../utils/auth";
+import {removeCookie, setCookie, setID, setToken} from "../../utils/auth";
 import {login} from "../../api/baseHandle";
 
 const state = {
@@ -30,8 +30,6 @@ const actions = {
                 const token = data.token;
                 const id = data.id;
                 const username = data.username;
-                /*更新用户登陆列表*/
-                if (this.$api.searchLoginState(id)) return reject('账号已登录,请勿重复登陆');
                 setID(id);
                 setToken(token);
                 setCookie('username', username);

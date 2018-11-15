@@ -28,4 +28,4 @@ app.on('ready', () => {
 });
 
 // Require `main` process to boot app
-require('./electron');
+require('./electron_entry');
