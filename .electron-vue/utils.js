@@ -76,6 +76,8 @@ exports.setMainEntry = function (type, mode) {
         json.window = wConfig;
         json.main = 'src/main/nw_entry.js';
     }
-    fs.writeFileSync(path.resolve('src', 'nodeApi', 'index.js'), `import obj from './${type}_api';export default obj;`, 'utf-8');
+    fs.writeFileSync(path.resolve('src', 'nodeApi', 'index.js'),
+        `import api from './${type}_api';export default {install(Vue) {Vue.prototype.$api = api;}};`,
+        'utf-8');
     fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, '  '), 'utf-8');
 };
