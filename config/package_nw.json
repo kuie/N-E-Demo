@@ -1,0 +1,24 @@
+{
+  "main": "src/main/nw_entry.js",
+  "dependencies": {
+    "node-webkit-updater": "^0.3.3",
+    "nw": "0.14.7-sdk"
+  },
+  "devDependencies": {
+    "connect-history-api-fallback": "^1.5.0",
+    "express": "^4.16.3",
+    "http-proxy-middleware": "^0.19.0",
+    "iconv-lite": "^0.4.24",
+    "innosetup-compiler": "^5.5.9",
+    "node-loader": "^0.6.0",
+    "node-sass": "^4.9.3",
+    "nw-builder": "^3.5.4",
+    "optimize-css-assets-webpack-plugin": "^3.2.0",
+    "semver": "^5.3.0",
+    "webpack-bundle-analyzer": "^3.0.2",
+    "webpack-dev-middleware": "^2.0.0",
+    "webpack-dev-server": "^2.11.3",
+    "webpack-hot-middleware": "^2.24.2"
+  },
+  "node-remote": "<all_urls>"
+}
