@@ -1,4 +1,4 @@
-require('./update').checkUpdate();
+// require('./update').checkUpdate();
 const baseUrl = 'http://localhost:8080';
 const createWin = _ => nw.Window.open(baseUrl, {
     width: 800,

@@ -68,9 +68,9 @@ export function downloadHandle(savePath, json) {
     return ev
 }
 
-// export default {
-//     getUpdateJson,
-//     parseName,
-//     checkUpdate,
-//     downloadHandle
-// };
+export default {
+    getUpdateJson,
+    parseName,
+    checkUpdate,
+    downloadHandle
+};
