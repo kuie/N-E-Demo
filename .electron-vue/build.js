@@ -1,24 +1,21 @@
 'use strict';
-
 process.env.NODE_ENV = 'production';
+require('./utils').setMainEntry(process.env.BUILD_TARGET, 'production');
 require('./nw/check-versions')();
 const {say} = require('cfonts');
 const chalk = require('chalk');
 const del = require('del');
 const webpack = require('webpack');
 const Multispinner = require('multispinner');
-
 const mainConfig = require('./webpack.main.config');
 const rendererConfig = require('./webpack.renderer.config');
 const webConfig = require('./webpack.web.config');
 const nwProdConfig = require('./nw/webpack.prod.conf');
-
 const doneLog = chalk.bgGreen.white(' DONE ') + ' ';
 const errorLog = chalk.bgRed.white(' ERROR ') + ' ';
 const okayLog = chalk.bgBlue.white(' OKAY ') + ' ';
-const isCI = process.env.CI || false;
 
-require('./utils').setMainEntry(process.env.BUILD_TARGET, 'production');
+const isCI = process.env.CI || false;
 
 switch (process.env.BUILD_TARGET) {
     case 'clean':

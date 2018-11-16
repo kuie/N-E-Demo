@@ -20,15 +20,14 @@ const vueLoaderConfig = require('./vue-loader.conf');
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
 let whiteListedModules = ['vue'];
-
+let externals = [...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))]
+    .concat([...Object.keys(require('../config/package_nw').devDependencies || {})]);
 let rendererConfig = {
     devtool: '#cheap-module-eval-source-map',
     entry: {
         renderer: path.join(__dirname, '../src/renderer/main.js')
     },
-    externals: [
-        ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
-    ],
+    externals,
     module: {
         rules: [
             {

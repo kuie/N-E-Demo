@@ -7,14 +7,14 @@ const {dependencies} = require('../package.json')
 const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babel-minify-webpack-plugin')
-
+let whiteListedModules = ['vue'];
+let externals = [...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))]
+    .concat([...Object.keys(require('../config/package_nw').devDependencies || {})]);
 let mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/electron_entry.js')
     },
-    externals: [
-        ...Object.keys(dependencies || {})
-    ],
+    externals,
     module: {
         rules: [
             {

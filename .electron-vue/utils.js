@@ -69,15 +69,14 @@ exports.styleLoaders = function (options) {
 
 exports.setMainEntry = function (type, mode) {
     if (!/^(nw|electron|web)$/.test(type)) return false;
-    const packageJsonPath = path.resolve('./', 'package.json');
-    let json = JSON.parse(fs.readFileSync(packageJsonPath).toString());
-    json.main = `./dist/${type}/main.js`;
-    if (mode === 'development' && type === 'nw') {
-        json.window = wConfig;
-        json.main = 'src/main/nw_entry.js';
-    }
-    fs.writeFileSync(path.resolve('src', 'nodeApi', 'index.js'),
-        `import api from './${type}_api';export default {install(Vue) {Vue.prototype.$api = api;}};`,
-        'utf-8');
-    fs.writeFileSync(packageJsonPath, JSON.stringify(json, null, '  '), 'utf-8');
+    fs.writeFileSync(path.resolve('src', 'nodeApi', 'index.js'), `import api from './${type}_api';export default {install(Vue) {Vue.prototype.$api = api;}};`, 'utf-8');
+    const packagePath = path.resolve('./', 'package.json'),
+        basePackagePath = path.resolve('./', 'config', 'package_base.json'),
+        baseJson = require(basePackagePath),
+        targetJson = require(path.resolve('./', 'config', `package_${type}.json`));
+    targetJson.dependencies = Object.assign(baseJson.dependencies, targetJson.dependencies);
+    targetJson.devDependencies = Object.assign(baseJson.devDependencies, targetJson.devDependencies);
+    const json = Object.assign(baseJson, targetJson);
+    if (type === 'nw') json.window = wConfig;
+    fs.writeFileSync(packagePath, JSON.stringify(json, null, '  '), 'utf-8');
 };
