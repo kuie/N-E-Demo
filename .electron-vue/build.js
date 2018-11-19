@@ -54,7 +54,7 @@ function nw() {
         .then(result => {
             results += result + '\n\n';
             m.success('renderer', '测试一下');
-            return require('./build-nw.js');
+            return require('./build-nw');
         })
         .catch(err => {
             m.error('renderer');
