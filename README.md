@@ -4,9 +4,14 @@
 
 #### Build Setup
 
+不能直接使用yarn 安装 依赖 因为兼容nw 模式的同时package.json中会有两种模式下的全部依赖包、
+
+为了缩小两种模式下的构建出的可执行文件体积安装依赖包的时候需要 全部安装 但在打包或调试时不需要全部引用
+package.json也是通过脚本动态生成的
+
 ``` bash
 # install dependencies
-yarn
+yarn run installModules
 
 # electron mode serve with hot reload at localhost:9080
 yarn run dev:electron
@@ -97,3 +102,14 @@ nwjs_urlbase "http://localhost/nwjs/v"
 因此不能完全通过这种分布式管理的方式进行控制
 
 因为窗口如果存在就不能解决被刷新的问题
+
+#### 关于自动更新
+在网上看了很多更新的例子 但发现都是通过autoUpdate下载安装包进行更新
+
+但我发现直接将构建后的xxx-unpackage文件夹里的文件复制到安装目录其实就实现了更新
+
+正在尝试通过打包完毕后生成全部文件的hashMao实现增量更新
+提高用户体验
+但这种增量更新不容易抽离成公共方法
+对于项目的针对性较高
+也许不适合作为插件或单独成为项目
