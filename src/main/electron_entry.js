@@ -36,6 +36,19 @@ let quitBtn = {
     label: '退出',
     click: _ => app.quit()
 };
+let relaunchBtn = {
+    label: '重启',
+    click: _ => {
+        app.relaunch();
+        app.exit(0)
+    }
+};
+let quitLaunchBtn = {
+    label: '退出实例',
+    click: _ => {
+        app.relaunch();
+    }
+};
 const updateIconMenu = _ => {
     let MenuList = businessWinList.map(item => {
         return {
@@ -47,6 +60,8 @@ const updateIconMenu = _ => {
     });
     MenuList.unshift(createWinBtn);
     MenuList.push(quitBtn);
+    MenuList.push(relaunchBtn);
+    MenuList.push(quitLaunchBtn);
     const contextMenu = Menu.buildFromTemplate(MenuList);
     appIcon.setToolTip('多任务管理');
     appIcon.setContextMenu(contextMenu)
@@ -154,7 +169,7 @@ app.on('activate', () => {
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit()
+        // app.quit()
     }
     // if (appIcon) appIcon.destroy()
 });

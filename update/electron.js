@@ -18,10 +18,9 @@ const fs = require('fs');
 const path = require('path');
 const {exec} = require('child_process');
 const crypto = require('crypto');
-// const appPath = app.getAppPath();
 const appPath = path.resolve(__dirname, '..', 'build', 'electron', 'win-unpacked');
 
-function walk(dir, basePath) {
+function walk(dir) {
     var children = [];
     fs.readdirSync(dir).forEach(function (filename) {
         var fp = dir + "/" + filename;
