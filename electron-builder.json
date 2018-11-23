@@ -15,7 +15,7 @@
     "createStartMenuShortcut": true,
     "shortcutName": "测试"
   },
-  "copyright": "faf",
+  "copyright": "www.qudao.com",
   "files": [
     "dist/electron/**/*"
   ],

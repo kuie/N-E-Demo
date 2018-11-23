@@ -1,7 +1,9 @@
 const uuidV1 = require('uuid/v1');
-import {app, BrowserWindow, globalShortcut, ipcMain, Menu, remote, session, Tray} from 'electron'
-import {autoUpdater} from 'electron-updater'
+import {app, BrowserWindow, globalShortcut, ipcMain, Menu, remote, session, Tray, Notification} from 'electron'
+// import {autoUpdater} from 'electron-updater'
+import electronUpdate from './update/electron-updater';
 
+const fs = require('fs');
 const path = require('path');
 
 /*session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -218,17 +220,18 @@ app.setJumpList([
  * support auto updating. Code Signing with a valid certificate is required.
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
+/*
 
 const os = require('os').platform();
 const appVersion = require('../../package.json').version;
 
 let updateFeed = 'http://localhost/build/electron/win-unpacked';
 
-/*if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV !== 'development') {
     updateFeed = os === 'darwin' ?
         'https://mysite.com/updates/latest' :
         'http://download.mysite.com/releases/win32';
-}*/
+}
 
 autoUpdater.setFeedURL(updateFeed + '?v=' + appVersion);
 
@@ -240,4 +243,34 @@ app.on('ready', () => {
     if (process.env.NODE_ENV === 'production') {
         autoUpdater.checkForUpdates()
     }
+});
+*/
+app.on('ready', () => {
+    if (process.env.NODE_ENV === 'production') {
+        const installPath = app.getPath('exe').replace(/\\[\w-_]+\.exe$/, '');
+        electronUpdate(app.getVersion(), installPath);
+    }
+    /*const appPath = {
+        appPath: app.getAppPath(),
+        home: app.getPath('home'),
+        appData: app.getPath('appData'),
+        userData: app.getPath('userData'),
+        temp: app.getPath('temp'),
+        exe: app.getPath('exe'),
+        module: app.getPath('module'),
+        desktop: app.getPath('desktop'),
+        version: app.getVersion()
+    };
+
+    let a = {
+        "appPath": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\resources\\app.asar",
+        "home": "C:\\Users\\zp_field",
+        "appData": "C:\\Users\\zp_field\\AppData\\Roaming",
+        "userData": "C:\\Users\\zp_field\\AppData\\Roaming\\evt1",
+        "temp": "C:\\Users\\zp_field\\AppData\\Local\\Temp",
+        "exe": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
+        "module": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
+        "desktop": "C:\\Users\\zp_field\\Desktop",
+        "version": "0.2.0"
+    }*/
 });

@@ -40,7 +40,9 @@ const cacheBasePath = path.resolve(__dirname, 'cache');
 Promise.all(walkArr.filter(fp => /\.asar/.test(fp)).map(fp => {
     return new Promise((resolve, reject) => {
         let asarPathReg = new RegExp(`^${JSON.stringify(appPath).replace(/"/g, '')}`);
-        let cachePath = path.join(cacheBasePath, fp.replace(asarPathReg, ''));
+        let asarFP = path.parse(fp);
+        let cachePath = path.join(asarFP.dir, asarFP.base.replace(/\./, '-'));
+        console.log(JSON.stringify(asarFP));
         exec(`asar e ${fp} ${cachePath}`, (err, stdout, stderr) => {
             if (err) {
                 console.error(`exec error: ${err}`);
@@ -50,8 +52,9 @@ Promise.all(walkArr.filter(fp => /\.asar/.test(fp)).map(fp => {
         });
     });
 })).then(res => {
+    const version = require('../package').version;
     res.forEach(arr => walkArr = walkArr.concat(arr));
-    writerStream = fs.createWriteStream('./build/electron/hashMap');
+    writerStream = fs.createWriteStream(`./build/electron/hashMap-v${version}`);
     const basePath = '$bp';
     const cacheBasePathReg = new RegExp(`^(${JSON.stringify(cacheBasePath).replace(/"/g, '')}|${JSON.stringify(appPath).replace(/"/g, '')})`);
     walkArr.forEach(fp => {
@@ -59,6 +62,9 @@ Promise.all(walkArr.filter(fp => /\.asar/.test(fp)).map(fp => {
         const hash = crypto.createHash('md5');
         const rs = fs.createReadStream(fp);
         rs.on('data', hash.update.bind(hash));
-        rs.on('end', () => writerStream.write(`${fp.replace(cacheBasePathReg, basePath).replace(/\\/g, '\/')}-->${hash.digest('hex')}\n`, 'UTF8'));
+        rs.on('end', () => {
+            writerStream.write(`${fp.replace(cacheBasePathReg, basePath).replace(/\\/g, '\/')}-->${hash.digest('hex')}\n`, 'UTF8');
+        });
     });
+    fs.writeFileSync('./build/electron/lastVersion', version, 'utf-8');
 });
