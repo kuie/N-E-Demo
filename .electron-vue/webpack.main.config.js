@@ -7,7 +7,7 @@ const {dependencies} = require('../package.json')
 const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babel-minify-webpack-plugin')
-let whiteListedModules = ['vue'];
+let whiteListedModules = ['asar'];
 let externals = [...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))]
     .concat([...Object.keys(require('../config/package_nw').devDependencies || {})]);
 let mainConfig = {

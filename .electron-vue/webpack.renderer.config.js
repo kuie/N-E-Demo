@@ -19,15 +19,15 @@ const vueLoaderConfig = require('./vue-loader.conf');
  * that provide pure *.vue files that need compiling
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
-let whiteListedModules = ['vue'];
-let externals = [...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))]
-    .concat([...Object.keys(require('../config/package_nw').devDependencies || {})]);
+// let whiteListedModules = ['vue', 'dexie', 'iview', 'vue-router', 'vuex'];
+// let externals = [...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))]
+//     .concat([...Object.keys(require('../config/package_nw').devDependencies || {})]);
 let rendererConfig = {
     devtool: '#cheap-module-eval-source-map',
     entry: {
         renderer: path.join(__dirname, '../src/renderer/main.js')
     },
-    externals,
+    externals: ["node-webkit-updater", "nw", "electron-updater", "asar"],
     module: {
         rules: [
             {
@@ -91,29 +91,6 @@ let rendererConfig = {
     },
     plugins: [
         new ExtractTextPlugin('styles.css'),
-
-        /*// 构建index.html文件
-        new HtmlWebpackPlugin({
-            filename: config.build.index,
-            template: 'index.html',
-            //注入js脚本连接
-            inject: true,
-            //压缩控制
-            minify: {
-                collapseWhitespace: true,
-                removeComments: true,
-                removeRedundantAttributes: true,
-                removeScriptTypeAttributes: true,
-                removeStyleLinkTypeAttributes: true,
-                useShortDoctype: true,
-                removeAttributeQuotes: true
-            },
-            // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-            chunksSortMode: 'dependency',
-            //不引入main.js 主进程启动入口仅供nw.js启动主进程
-            excludeChunks: ['main']
-        }),*/
-
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(__dirname, '../index.html'),
