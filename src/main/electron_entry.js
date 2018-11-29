@@ -1,9 +1,20 @@
 const uuidV1 = require('uuid/v1');
-import {app, BrowserWindow, globalShortcut, ipcMain, Menu, remote, session, Tray, Notification} from 'electron'
+import {
+    app,                            //实例对象
+    BrowserWindow,                  //窗口类
+    globalShortcut,                 //全局快捷键
+    ipcMain,                        //主进程
+    Menu,                           //菜单
+    remote,                         //远程
+    session,                        //会话对象
+    Tray,                           //任务栏图标
+    Notification,                   //通知
+    powerMonitor,                   //电源监控
+    dialog                          //弹窗
+} from 'electron'
 // import {autoUpdater} from 'electron-updater'
-import electronUpdate from './update/electron-updater';
+// import electronUpdate from './update/electron-updater';
 
-const fs = require('fs');
 const path = require('path');
 
 /*session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -114,6 +125,14 @@ function createMain() {
         path.resolve(__dirname, '..', '..', 'build', 'icons', 'icon.ico') :
         `${__static}/icon.ico`;
     appIcon = new Tray(iconPath);
+    //电源监视
+    [
+        'lock-screen',//锁屏
+        'unlock-screen',//解锁
+        'suspend',//睡眠
+        'resume'//唤醒
+    ].forEach(key => powerMonitor.on(key, e => businessWinList.forEach(v => v.win.send(key))));
+    //窗口事件处理
     ipcMain.on('min', (e, uuid) => {
         let win = getWin(uuid).win;
         win.minimize();
@@ -173,6 +192,7 @@ app.on('window-all-closed', () => {
     }
     // if (appIcon) appIcon.destroy()
 });
+
 
 app.setJumpList([
     {
@@ -235,20 +255,19 @@ app.setJumpList([
  * support auto updating. Code Signing with a valid certificate is required.
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
-/*
 
-const os = require('os').platform();
-const appVersion = require('../../package.json').version;
+/*const os = require('os').platform();
+// const appVersion = require('../../package.json').version;
 
-let updateFeed = 'http://localhost/build/electron/win-unpacked';
+let updateFeed = 'http://localhost/update/electron/win-unpacked';
 
-if (process.env.NODE_ENV !== 'development') {
-    updateFeed = os === 'darwin' ?
-        'https://mysite.com/updates/latest' :
-        'http://download.mysite.com/releases/win32';
-}
+// if (process.env.NODE_ENV !== 'development') {
+//     updateFeed = os === 'darwin' ?
+//         'https://mysite.com/updates/latest' :
+//         'http://download.mysite.com/releases/win32';
+// }
 
-autoUpdater.setFeedURL(updateFeed + '?v=' + appVersion);
+autoUpdater.setFeedURL(updateFeed);
 
 autoUpdater.on('update-downloaded', () => {
     autoUpdater.quitAndInstall()
@@ -258,14 +277,15 @@ app.on('ready', () => {
     if (process.env.NODE_ENV === 'production') {
         autoUpdater.checkForUpdates()
     }
-});
-*/
-app.on('ready', () => {
+});*/
+
+/*todo 临时关闭自动更新 测试其他功能*/
+/*app.on('ready', () => {
     if (process.env.NODE_ENV === 'production') {
         const installPath = app.getPath('exe').replace(/\\[\w-_]+\.exe$/, '');
-        electronUpdate(app.getVersion(), installPath);
+        electronUpdate({app, version: app.getVersion(), installPath});
     }
-    /*const appPath = {
+    /!*const appPath = {
         appPath: app.getAppPath(),
         home: app.getPath('home'),
         appData: app.getPath('appData'),
@@ -287,5 +307,5 @@ app.on('ready', () => {
         "module": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
         "desktop": "C:\\Users\\zp_field\\Desktop",
         "version": "0.2.0"
-    }*/
-});
+    }*!/
+});*/

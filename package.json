@@ -1,6 +1,6 @@
 {
   "name": "evt1",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "author": "kuie881231@gmail.com",
   "description": "An electron-vue project",
   "license": "",
@@ -29,7 +29,9 @@
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "electron-updater": "^3.1.2"
+    "semver": "^5.6.0",
+    "node-webkit-updater": "^0.3.3",
+    "nw": "0.14.7-sdk"
   },
   "devDependencies": {
     "autoprefixer": "^9.1.5",
@@ -68,11 +70,18 @@
     "vue-template-compiler": "^2.5.17",
     "webpack": "^3.12.0",
     "webpack-merge": "^4.1.4",
+    "connect-history-api-fallback": "^1.5.0",
+    "express": "^4.16.3",
+    "http-proxy-middleware": "^0.19.0",
+    "iconv-lite": "^0.4.24",
+    "innosetup-compiler": "^5.5.9",
     "node-loader": "^0.6.0",
-    "devtron": "^1.4.0",
-    "electron": "^3.0.2",
-    "electron-debug": "^2.0.0",
-    "electron-devtools-installer": "^2.2.4"
+    "nw-builder": "^3.5.4",
+    "optimize-css-assets-webpack-plugin": "^3.2.0",
+    "webpack-bundle-analyzer": "^3.0.2",
+    "webpack-dev-middleware": "^2.0.0",
+    "webpack-dev-server": "^2.11.3",
+    "webpack-hot-middleware": "^2.24.2"
   },
   "engines": {
     "node": ">= 7.0.0",
@@ -82,5 +91,21 @@
     "last 2 Chrome versions"
   ],
   "chromium-args": "--mixed-context",
-  "main": "./dist/electron/main.js"
+  "main": "src/main/nw_entry.js",
+  "node-remote": "<all_urls>",
+  "window": {
+    "title": "App Vue Test",
+    "toolbar": false,
+    "width": 800,
+    "height": 500,
+    "min_width": 500,
+    "min_height": 500,
+    "resizable": true,
+    "frame": false,
+    "kiosk": false,
+    "show": false,
+    "icon": "/static/logo.png",
+    "show_in_taskbar": true,
+    "fullscreen": false
+  }
 }

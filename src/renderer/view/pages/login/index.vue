@@ -15,13 +15,20 @@
             <Button type="primary" @click="login">登陆</Button>
         </FormItem>
         <Button type="primary" @click="sendMsg">发送时间</Button>
+        <Button type="primary" @click="sendMsg">发送时间2</Button>
+        <Button type="primary" @click="sendMsg">发送时间3</Button>
+        <screen-state @state="screenStateChange"></screen-state>
     </Form>
 </template>
 
 <script>
     import store from '../../../store'
+    import screenState from '../../components/screenState';
 
     export default {
+        components: {
+            screenState
+        },
         data() {
             return {
                 loginForm: {
@@ -70,6 +77,9 @@
             },
             sendMsg() {
                 this.$api.sendMsg(new Date().toString());
+            },
+            screenStateChange(obj) {
+                console.log(obj.type);
             }
         }
     }

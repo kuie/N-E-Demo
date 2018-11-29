@@ -5,6 +5,11 @@ const uuid = _ => sessionStorage.getItem('uuid');
 //回话持久化uuid
 !uuid() && sessionStorage.setItem('uuid', ipc.sendSync('giveMyID'));
 ipc.on('log', (e, arg) => console.log(arg));
+ipc.on('lock-screen', (e, arg) => window.dispatchEvent(new Event('lock-screen')));
+ipc.on('unlock-screen', (e, arg) => window.dispatchEvent(new Event('unlock-screen')));
+ipc.on('suspend', (e, arg) => window.dispatchEvent(new Event('suspend')));
+ipc.on('resume', (e, arg) => window.dispatchEvent(new Event('resume')));
+
 
 export default {
     /*顶部条基础操作 最大，最小，关闭*/
