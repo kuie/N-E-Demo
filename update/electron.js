@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 // const {Transform} = require('stream');
-const readLine = require('readline');
+// const readLine = require('readline');
 const version = process.argv[2] || require('../package').version;
 const dirList = parentPath => fs.readdirSync(parentPath)
     .map(filename => {
@@ -109,16 +109,17 @@ const aesEncrypt = (data, key) => {
     return crypted;
 };
 
-//对称解密
-const aesDecrypt = (encrypted, key) => {
+//对称解密（测试使用）
+/*const aesDecrypt = (encrypted, key) => {
     const decipher = crypto.createDecipher('aes192', key);
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
-};
+};*/
 
 dl.forEach(appPath => {
     const unpackedDir = dirList(appPath).filter(file => !!/unpacked$/.test(file))[0];
+    console.log(path.parse(appPath));
     const ws = fs.createWriteStream(path.join(versionDir, `hashMap-v${version}-${path.parse(appPath).base}.txt`));
     Promise.all(walk(unpackedDir).map(fp => new Promise((resolve, reject) => {
         const hash = crypto.createHash('md5');

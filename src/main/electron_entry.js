@@ -1,4 +1,5 @@
 const uuidV1 = require('uuid/v1');
+const fs = require('fs');
 import {
     app,                            //实例对象
     BrowserWindow,                  //窗口类
@@ -36,13 +37,17 @@ const businessWinList = [];
 const winURL = process.env.NODE_ENV === 'development' ?
     `http://localhost:9080` :
     `file://${__dirname}/index.html`;
+const logPath = path.resolve(app.getPath('exe').replace(/\\[\w-_]+\.exe$/, ''), 'mainProcessLog.log');
+const mainLog = log => fs.appendFileSync(logPath, `${new Date()}-->${JSON.stringify(log)}\n`, 'utf-8');
+
 /**
  * 通过businessWinList 数组更新任务栏Icon 列表
  * */
-let createWinBtn = {
-    label: '新建窗口',
-    click: _ => createRendererWindow()
-};
+let
+    createWinBtn = {
+        label: '新建窗口',
+        click: _ => createRendererWindow()
+    };
 let quitBtn = {
     label: '退出',
     click: _ => app.quit()
@@ -81,6 +86,7 @@ const updateIconMenu = _ => {
  * 生成独立登陆窗口
  * */
 const createRendererWindow = _ => {
+    mainLog('createWindow');
     let win = new BrowserWindow(wConfig);
     const uuid = uuidV1();
     /*子窗口关闭事件*/
@@ -100,10 +106,16 @@ const createRendererWindow = _ => {
     win.on('closed', () => win = null);
     /*加载页面后展示页面*/
     win.once('ready-to-show', () => {
+        mainLog('window ready to show');
         win.show();
+    });
+    win.on('error', (e) => {
+        mainLog('win 对象出现错误');
+        mainLog(e);
     });
     businessWinList.push({id: null, win, uuid, username: '未登录'});
     updateIconMenu();
+    mainLog(`开始加载Url:${winURL}`);
     win.loadURL(winURL);
 };
 /**
@@ -121,6 +133,7 @@ const getWin = uuid => {
 };
 
 function createMain() {
+    mainLog('app Ready');
     const iconPath = process.env.NODE_ENV === 'development' ?
         path.resolve(__dirname, '..', '..', 'build', 'icons', 'icon.ico') :
         `${__static}/icon.ico`;
@@ -178,7 +191,38 @@ function createMain() {
     createRendererWindow();
 }
 
-app.on('ready', createMain);
+app.on('ready', () => {
+    if (process.env.NODE_ENV === 'production') {
+        const installPath = app.getPath('exe').replace(/\\[\w-_]+\.exe$/, '');
+        electronUpdate({app, version: app.getVersion(), installPath})
+            .finally(() => createMain());
+        /*const appPath = {
+            appPath: app.getAppPath(),
+            home: app.getPath('home'),
+            appData: app.getPath('appData'),
+            userData: app.getPath('userData'),
+            temp: app.getPath('temp'),
+            exe: app.getPath('exe'),
+            module: app.getPath('module'),
+            desktop: app.getPath('desktop'),
+            version: app.getVersion()
+        };
+
+        let a = {
+            "appPath": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\resources\\app.asar",
+            "home": "C:\\Users\\zp_field",
+            "appData": "C:\\Users\\zp_field\\AppData\\Roaming",
+            "userData": "C:\\Users\\zp_field\\AppData\\Roaming\\evt1",
+            "temp": "C:\\Users\\zp_field\\AppData\\Local\\Temp",
+            "exe": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
+            "module": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
+            "desktop": "C:\\Users\\zp_field\\Desktop",
+            "version": "0.2.0"
+        }*/
+    } else {
+        return createMain()
+    }
+});
 
 app.on('activate', () => {
     if (!businessWinList.length) {
@@ -278,34 +322,3 @@ app.on('ready', () => {
         autoUpdater.checkForUpdates()
     }
 });*/
-
-/*todo 临时关闭自动更新 测试其他功能*/
-app.on('ready', () => {
-    if (process.env.NODE_ENV === 'production') {
-        const installPath = app.getPath('exe').replace(/\\[\w-_]+\.exe$/, '');
-        electronUpdate({app, version: app.getVersion(), installPath});
-    }
-    /*const appPath = {
-        appPath: app.getAppPath(),
-        home: app.getPath('home'),
-        appData: app.getPath('appData'),
-        userData: app.getPath('userData'),
-        temp: app.getPath('temp'),
-        exe: app.getPath('exe'),
-        module: app.getPath('module'),
-        desktop: app.getPath('desktop'),
-        version: app.getVersion()
-    };
-
-    let a = {
-        "appPath": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\resources\\app.asar",
-        "home": "C:\\Users\\zp_field",
-        "appData": "C:\\Users\\zp_field\\AppData\\Roaming",
-        "userData": "C:\\Users\\zp_field\\AppData\\Roaming\\evt1",
-        "temp": "C:\\Users\\zp_field\\AppData\\Local\\Temp",
-        "exe": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
-        "module": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
-        "desktop": "C:\\Users\\zp_field\\Desktop",
-        "version": "0.2.0"
-    }*/
-});

@@ -130,9 +130,11 @@ const delAll = filePath => {
 let basePath = '';
 //打印日志
 const nodeLog = log => fs.appendFileSync(path.join(basePath, 'logMessage.log'), `${new Date()}-->${JSON.stringify(log)}\n`, 'utf-8');
+// const nodeLog = log => log;
 //重启
 const relaunch = app => {
-    app.relaunch();
+    // app.relaunch();
+    exec()
     app.exit(0);
 };
 //对称解密
@@ -182,7 +184,7 @@ export default (ops) => {
     * */
     //获取hash文件
     nodeLog(`hashMap是否存在？：${fs.existsSync(path.join(installPath, `hashMap-v${version}`))}`);
-    new Promise((resolve, reject) => fs.existsSync(path.join(installPath, `hashMap-v${version}`)) ?
+    return new Promise((resolve, reject) => fs.existsSync(path.join(installPath, `hashMap-v${version}`)) ?
         resolve() :
         getHashMap(version).then(resolve))
     //获取最新版本号
@@ -219,7 +221,8 @@ export default (ops) => {
             nodeLog(HM);
             const oha = log2Arr(HM.o), nha = log2Arr(HM.n);
             const oho = arr2Obj(oha), nho = arr2Obj(nha);
-            const addArr = oaFilter(nha, oho);
+            //不更新可执行文件
+            const addArr = oaFilter(nha, oho).filter(v => !/\.exe$/.test(v.path));
             delArr = oaFilter(oha, nho);
             nodeLog(`addArr`);
             nodeLog(addArr);
@@ -228,7 +231,7 @@ export default (ops) => {
                 const cacheDir = path.join(installPath, `cacheData-${lastVersion}`);
                 return Promise.all(addArr.map(item => new Promise((resolve, reject) => {
                     let code = -1;
-                    const url = item.path.replace(/^[/\\]+/, `${baseUrl}v${lastVersion}/${platform}/${platform}-ia32-unpacked/`).replace(/\\+/g, '/');
+                    const url = item.path.replace(/^[/\\]+/, `${baseUrl}v${lastVersion}${platform === 'win' ? '/win/win-ia32-unpacked/' : '/mac/mac-x64-unpacked/'}`).replace(/\\+/g, '/');
                     nodeLog(`url:${url}`);
                     const filePath = path.normalize(`${cacheDir}${item.path}`);
                     nodeLog(`filePath:${filePath}`);
