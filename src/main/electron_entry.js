@@ -13,7 +13,7 @@ import {
     dialog                          //弹窗
 } from 'electron'
 // import {autoUpdater} from 'electron-updater'
-// import electronUpdate from './update/electron-updater';
+import electronUpdate from './update/electron-updater';
 
 const path = require('path');
 
@@ -280,12 +280,12 @@ app.on('ready', () => {
 });*/
 
 /*todo 临时关闭自动更新 测试其他功能*/
-/*app.on('ready', () => {
+app.on('ready', () => {
     if (process.env.NODE_ENV === 'production') {
         const installPath = app.getPath('exe').replace(/\\[\w-_]+\.exe$/, '');
         electronUpdate({app, version: app.getVersion(), installPath});
     }
-    /!*const appPath = {
+    /*const appPath = {
         appPath: app.getAppPath(),
         home: app.getPath('home'),
         appData: app.getPath('appData'),
@@ -307,5 +307,5 @@ app.on('ready', () => {
         "module": "C:\\Users\\zp_field\\AppData\\Local\\Programs\\evt1\\evt1.exe",
         "desktop": "C:\\Users\\zp_field\\Desktop",
         "version": "0.2.0"
-    }*!/
-});*/
+    }*/
+});

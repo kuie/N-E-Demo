@@ -77,6 +77,18 @@ exports.setMainEntry = function (type, mode) {
     targetJson.dependencies = Object.assign(baseJson.dependencies, targetJson.dependencies);
     targetJson.devDependencies = Object.assign(baseJson.devDependencies, targetJson.devDependencies);
     const json = Object.assign(baseJson, targetJson);
-    if (type === 'nw') json.window = wConfig;
+    if (type === 'nw') {
+        json.window = wConfig;
+    } else if (type === 'electron') {
+        const typePackage = {
+            name: json.name,
+            version: json.version,
+            author: json.author,
+            description: json.description,
+            main: `./electron/main.js`
+        };
+        const typePackagePath = path.resolve('./', 'dist', 'package.json');
+        fs.writeFileSync(typePackagePath, JSON.stringify(typePackage, null, '  '), 'utf-8');
+    }
     fs.writeFileSync(packagePath, JSON.stringify(json, null, '  '), 'utf-8');
 };

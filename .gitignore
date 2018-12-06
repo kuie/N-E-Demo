@@ -1,5 +1,6 @@
 .DS_Store
-dist/
+dist/*
+!dist/electron-builder.json
 build/*
 !build/icons
 coverage
