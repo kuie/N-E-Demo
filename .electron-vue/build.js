@@ -1,6 +1,7 @@
 'use strict';
 process.env.NODE_ENV = 'production';
 require('./utils').setMainEntry(process.env.BUILD_TARGET, 'production');
+//版本检查 关联 package.json 的engines
 require('./nw/check-versions')();
 const {say} = require('cfonts');
 const chalk = require('chalk');
@@ -31,56 +32,37 @@ switch (process.env.BUILD_TARGET) {
 }
 
 function nw() {
-    // if (config.build.onlyNW) return require('./build-nw.js');
     greeting();
-
     del.sync(['../dist/nw/*', '!.gitkeep']);
-
-    const tasks = ['renderer'];
+    const tasks = ['renderer', 'build-win-setup'];
     const m = new Multispinner(tasks, {
         preText: 'building',
         postText: 'process'
     });
-
     let results = '';
-
     m.on('success', _ => {
         process.stdout.write('\x1B[2J\x1B[0f');
         console.log(`\n\n${results}`);
         console.log(`${okayLog}\n`);
     });
-
     pack(nwProdConfig)
         .then(result => {
             results += result + '\n\n';
             m.success('renderer', '测试一下');
             return require('./build-nw');
         })
-        .catch(err => {
-            m.error('renderer');
-            console.log(`\n  ${errorLog}failed to build renderer process`);
-            console.error(`\n${err}\n`);
-            process.exit(1);
-        })
+        .catch(err => m.error('renderer'))
+        .then(mainConfig => require('./nw/build-win-setup.js')().then(() => {
+            m.success('build-win-setup');
+            return Promise.resolve(mainConfig);
+        }))
         .then(manifest => require('./nw/build-upgrade')(manifest))
-        .catch(err => {
-            m.error('renderer');
-            console.log(`\n  ${errorLog}failed to build build-nw process`);
-            console.error(`\n${err}\n`);
-            process.exit(1);
-        })
-        .catch(err => {
-            m.error('renderer');
-            console.log(`\n  ${errorLog}failed to build build-upgrade process`);
-            console.error(`\n${err}\n`);
-            process.exit(1);
-        });
+        .catch(err => m.error('build-win-setup'));
 }
 
 function clean() {
     del.sync(['build/*', '!build/icons', '!build/icons/icon.*']);
     console.log(`\n${doneLog}\n`);
-
     process.exit();
 }
 
@@ -214,16 +196,9 @@ function web() {
 function greeting() {
     const cols = process.stdout.columns;
     let text = '';
-
     if (cols > 85) text = 'lets-build';
     else if (cols > 60) text = 'lets-|build';
     else text = false;
-
-    if (text && !isCI) {
-        say(text, {
-            colors: ['yellow'],
-            font: 'simple3d',
-            space: false
-        });
-    } else console.log(chalk.yellow.bold('\n  lets-build'));
+    if (text && !isCI) say(text, {colors: ['yellow'], font: 'simple3d', space: false});
+    else console.log(chalk.yellow.bold('\n  lets-build'));
 }

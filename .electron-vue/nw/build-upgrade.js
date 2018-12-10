@@ -46,16 +46,16 @@ function makeUpgrade(manifest) {
 
             // due to files
             updCnf.files.forEach(function (curPath) {
-                let files = fs.readdirSync(curPath)
+                let files = fs.readdirSync(curPath);
 
                 files.forEach(function (fileName) {
-                    let platform = platforms[fileName]
-                    if (!platform) return
+                    let platform = platforms[fileName];
+                    if (!platform) return;
 
-                    let filePath = getFilePath(manifest, platform, fileName)
-                    let size = getFileSize(curPath, manifest, platform, fileName)
-                    upgradeJson.packages[platform.name] = {url: updCnf.publicPath + filePath, size: size}
-                })
+                    let filePath = getFilePath(manifest, platform, fileName);
+                    let size = getFileSize(curPath, manifest, platform, fileName);
+                    upgradeJson.packages[platform.name] = {url: updCnf.publicPath + filePath, size: size};
+                });
                 makeJson(upgradeJson);
             });
             resolve();

@@ -40,18 +40,18 @@ module.exports = {
             // see document: https://github.com/nwjs/nw-builder
             /*builder 默认设置*/
             /*builderDefault: {
-                files: null,
-                appName: false,
-                appVersion: false,
-                platforms: ['osx64', 'win32', 'win64'],
-                currentPlatform: detectCurrentPlatform(),
-                version: 'latest',
-                buildDir: './build',
-                cacheDir: './cache',
-                downloadUrl: 'https://dl.nwjs.io/',
-                manifestUrl: 'https://nwjs.io/versions.json',
-                flavor: 'sdk',
-                buildType: 'default',
+                files: null,//文件输出位置
+                appName: false,//应用名称
+                appVersion: false,//应用版本
+                platforms: ['osx64', 'win32', 'win64'],//打包为什么平台
+                currentPlatform: detectCurrentPlatform(),//打包平台
+                version: 'latest',//版本？
+                buildDir: './build',//打包文件所在位置
+                cacheDir: './cache',//缓存文件夹
+                downloadUrl: 'https://dl.nwjs.io/',//nwjs下载地址
+                manifestUrl: 'https://nwjs.io/versions.json',//资源文件相对路径
+                flavor: 'sdk',//资源文件类型
+                buildType: 'default',//timestamped or versioned or function
                 forceDownload: false,
                 macCredits: false,
                 macIcns: false,
@@ -68,7 +68,7 @@ module.exports = {
                 files: [resolve('../../dist/nw/**')],
                 platforms: ['win32', 'win64'],
                 version: '0.14.7',
-                flavor: 'normal',
+                flavor: 'normal',//normal or sdk
                 downloadUrl: 'http://localhost/nwjs/',//指定下载nwjs打包依赖文件的服务器地址
                 cacheDir: resolve('../../node_modules/_nw-builder-cache/'),
                 buildDir: resolve('../../build/nw'),
@@ -87,9 +87,7 @@ module.exports = {
                 appURL: 'https://github.com/anchengjian/vue-nw-seed',
                 appId: '{{A448363D-3A2F-4800-B62D-8A1C4D8F1115}}',
                 // data: { name, version, platform }
-                outputFileName: function (data) {
-                    return data.name + '-' + data.version
-                }
+                outputFileName: data => data.name + '-' + data.version
             },
             upgrade: {
                 outputFile: resolve('../../build/nw/upgrade.json'),

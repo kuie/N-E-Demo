@@ -1,5 +1,8 @@
 // require('./update').checkUpdate();
-const baseUrl = 'http://localhost:8080';
+
+// const baseUrl = process.NODE_ENV === 'production' ? '/index.html' : 'http://localhost:8080';
+const baseUrl = './index.html';
+console.log(nw.app);
 const createWin = _ => nw.Window.open(baseUrl, {
     width: 800,
     height: 500,
