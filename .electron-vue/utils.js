@@ -86,7 +86,10 @@ exports.setMainEntry = function (type, mode) {
             version: json.version,
             author: json.author,
             description: json.description,
-            main: `./main.js`
+            main: `./main.js`,
+            devDependencies: {
+                electron: json.devDependencies.electron
+            }
         };
         const typePackagePath = path.resolve('./', 'dist', 'package.json');
         fs.writeFileSync(typePackagePath, JSON.stringify(typePackage, null, '  '), 'utf-8');

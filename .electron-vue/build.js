@@ -142,73 +142,26 @@ const electron = () => {
             });
     });
     Promise.all([main, renderer]).then(res => {
-        electronBuilder.build({
-            config: {
-                "productName": "evt1",
-                "appId": "club.kuie.www",
-                "directories": {
-                    "output": path.resolve(__dirname, "../build/electron/v${version}/${os}/")
-                },
-                "nsis": {
-                    "oneClick": false,
-                    "allowElevation": false,
-                    "allowToChangeInstallationDirectory": true,
-                    "installerIcon": path.resolve(__dirname, "../build/icons/icon.ico"),
-                    "uninstallerIcon": path.resolve(__dirname, "../build/icons/icon.ico"),
-                    "installerHeaderIcon": path.resolve(__dirname, "../build/icons/icon.ico"),
-                    "createDesktopShortcut": true,
-                    "createStartMenuShortcut": true,
-                    "shortcutName": "通宝Demo"
-                },
-                "copyright": "www.qudao.com",
-                "files": [
-                    "./**/*",
-                    "!/0.js",
-                    "!./package.json",
-                    "!./package-lock.json",
-                    "!./electron-builder.json"
-                ],
-                "dmg": {
-                    "contents": [
-                        {
-                            "x": 410,
-                            "y": 150,
-                            "type": "link",
-                            "path": "/Applications"
-                        },
-                        {
-                            "x": 130,
-                            "y": 150,
-                            "type": "file"
-                        }
-                    ]
-                },
-                "win": {
-                    "icon": path.resolve(__dirname, "../build/icons/icon.ico",),
-                    "target": [
-                        {
-                            "target": "nsis",
-                            "arch": [
-                                "ia32"
-                            ]
-                        }
-                    ]
-                },
-                "mac": {
-                    "icon": path.resolve(__dirname, "../build/icons/icon.icns"),
-                },
-                "linux": {
-                    "icon": path.resolve(__dirname, "../build/icons")
-                }
+        try {
+            process.chdir('./dist/electron');
+            console.log(`New directory: ${process.cwd()}`);
+        } catch (err) {
+            console.error(`chdir: ${err}`);
+        }
+        exec('electron-builder ./', (error, stdout, stderr) => {
+            if (error) throw error;
+            console.log(stdout);
+            try {
+                process.chdir('../../');
+                console.log(`New directory: ${process.cwd()}`);
+            } catch (err) {
+                console.error(`chdir: ${err}`);
             }
-        }).then(() => {
             exec('node "./update/electron.js"', (error, stdout, stderr) => {
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
                 console.log(stdout);
             });
-        }).catch(e => console.log(e));
+        });
     });
 };
 const pack = config => {

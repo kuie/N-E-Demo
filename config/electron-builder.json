@@ -53,6 +53,6 @@
     "icon": "../../build/icons/icon.icns"
   },
   "linux": {
-    "icon": "../build/icons"
+    "icon": "../../build/icons"
   }
 }
