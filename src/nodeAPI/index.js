@@ -1,1 +1,1 @@
-import api from './electron_api';export default {install(Vue) {Vue.prototype.$api = api;}};
+import api from './nw_api';export default {install(Vue) {Vue.prototype.$api = api;}};

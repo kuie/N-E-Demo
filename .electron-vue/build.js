@@ -11,6 +11,12 @@ const webpack = require('webpack');
 const electronBuilder = require('electron-builder');
 //特效文字
 const {say} = require('cfonts');
+
+//测试区
+const mainNWConfig = require('./nw-new/webpack.main.config');
+const rendererNWConfig = require('./nw-new/webpack.renderer.config');
+
+
 //多任务展示
 const Multispinner = require('multispinner');
 const mainConfig = require('./webpack.main.config');
@@ -214,6 +220,70 @@ const greeting = () => {
     if (text && !isCI) say(text, {colors: ['yellow'], font: 'simple3d', space: false});
     else console.log(chalk.yellow.bold('\n  node-webkit Build'));
 };
+const nw_new = () => {
+    greeting();
+
+    del.sync(['dist/nw/*', '!.gitkeep']);
+
+    const tasks = ['main', 'renderer', 'build-win-setup'];
+    const m = new Multispinner(tasks, {
+        preText: 'building',
+        postText: 'process'
+    });
+
+    let results = '';
+
+    m.on('success', () => {
+        process.stdout.write('\x1B[2J\x1B[0f');
+        console.log(`\n\n${results}`);
+    });
+    let main = new Promise((resolve, reject) => {
+        pack(mainNWConfig)
+            .then(result => {
+                results += result + '\n\n';
+                m.success('main');
+                resolve();
+            })
+            .catch(err => {
+                m.error('main');
+                console.log(`\n  ${errorLog}failed to build main process`);
+                console.error(`\n${err}\n`);
+                process.exit(1);
+                reject();
+            });
+        // .finally(() => del([path.resolve(__dirname, '../dist/package.json')]));
+    });
+    let renderer = new Promise((resolve, reject) => {
+        pack(rendererNWConfig)
+            .then(result => {
+                results += result + '\n\n';
+                m.success('renderer');
+                resolve();
+            })
+            .catch(err => {
+                m.error('renderer');
+                console.log(`\n  ${errorLog}failed to build renderer process`);
+                console.error(`\n${err}\n`);
+                process.exit(1);
+                reject();
+            });
+    });
+    Promise.all([main, renderer])
+        .catch(e => console.log('webpack', e))
+        .then(res => require('./nw/build-nw'))
+        .catch(e => console.log('build-nw', e))
+        .then(mainConfig => {
+            return require('./nw/build-win-setup.js')()
+                .then(() => {
+                    m.success('build-win-setup');
+                    return Promise.resolve(mainConfig);
+                })
+                .catch(e => console.log('win-setup', e));
+        })
+        .catch(e => console.log('mainConfig', e))
+        .then(manifest => require('./nw/build-upgrade')(manifest))
+        .catch(err => m.error('build-win-setup'));
+};
 
 switch (process.env.BUILD_TARGET) {
     case 'clean':
@@ -221,7 +291,8 @@ switch (process.env.BUILD_TARGET) {
     case 'web':
         return web();
     case 'nw':
-        return nw();
+        // return nw();
+        return nw_new();
     case 'electron':
         return electron();
     default:
