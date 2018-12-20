@@ -3,11 +3,14 @@ process.env.NODE_ENV = 'production';
 require('./utils').setMainEntry(process.env.BUILD_TARGET, 'production');
 //版本检查 关联 package.json 的engines
 require('./nw/check-versions')();
-//特效文字
-const {say} = require('cfonts');
+const path = require('path');
+const exec = require('child_process').exec;
 const chalk = require('chalk');
 const del = require('del');
 const webpack = require('webpack');
+const electronBuilder = require('electron-builder');
+//特效文字
+const {say} = require('cfonts');
 //多任务展示
 const Multispinner = require('multispinner');
 const mainConfig = require('./webpack.main.config');
@@ -18,7 +21,6 @@ const doneLog = chalk.bgGreen.white(' DONE ') + ' ';
 const errorLog = chalk.bgRed.white(' ERROR ') + ' ';
 const okayLog = chalk.bgBlue.white(' OKAY ') + ' ';
 const isCI = process.env.CI || false;
-const path = require('path');
 const nw = () => {
     greeting();
     del.sync(['../dist/nw/*', '!.gitkeep']);
@@ -107,33 +109,107 @@ const electron = () => {
     m.on('success', () => {
         process.stdout.write('\x1B[2J\x1B[0f');
         console.log(`\n\n${results}`);
-        process.exit();
     });
-
-    pack(mainConfig)
-        .then(result => {
-            results += result + '\n\n';
-            m.success('main');
-        })
-        .catch(err => {
-            m.error('main');
-            console.log(`\n  ${errorLog}failed to build main process`);
-            console.error(`\n${err}\n`);
-            process.exit(1);
-        })
-        .finally(() => del([path.resolve(__dirname, '../dist/package.json')]));
-
-    pack(rendererConfig)
-        .then(result => {
-            results += result + '\n\n';
-            m.success('renderer');
-        })
-        .catch(err => {
-            m.error('renderer');
-            console.log(`\n  ${errorLog}failed to build renderer process`);
-            console.error(`\n${err}\n`);
-            process.exit(1);
-        });
+    let main = new Promise((resolve, reject) => {
+        pack(mainConfig)
+            .then(result => {
+                results += result + '\n\n';
+                m.success('main');
+                resolve();
+            })
+            .catch(err => {
+                m.error('main');
+                console.log(`\n  ${errorLog}failed to build main process`);
+                console.error(`\n${err}\n`);
+                process.exit(1);
+                reject();
+            })
+            .finally(() => del([path.resolve(__dirname, '../dist/package.json')]));
+    });
+    let renderer = new Promise((resolve, reject) => {
+        pack(rendererConfig)
+            .then(result => {
+                results += result + '\n\n';
+                m.success('renderer');
+                resolve();
+            })
+            .catch(err => {
+                m.error('renderer');
+                console.log(`\n  ${errorLog}failed to build renderer process`);
+                console.error(`\n${err}\n`);
+                process.exit(1);
+                reject();
+            });
+    });
+    Promise.all([main, renderer]).then(res => {
+        electronBuilder.build({
+            config: {
+                "productName": "evt1",
+                "appId": "club.kuie.www",
+                "directories": {
+                    "output": path.resolve(__dirname, "../build/electron/v${version}/${os}/")
+                },
+                "nsis": {
+                    "oneClick": false,
+                    "allowElevation": false,
+                    "allowToChangeInstallationDirectory": true,
+                    "installerIcon": path.resolve(__dirname, "../build/icons/icon.ico"),
+                    "uninstallerIcon": path.resolve(__dirname, "../build/icons/icon.ico"),
+                    "installerHeaderIcon": path.resolve(__dirname, "../build/icons/icon.ico"),
+                    "createDesktopShortcut": true,
+                    "createStartMenuShortcut": true,
+                    "shortcutName": "通宝Demo"
+                },
+                "copyright": "www.qudao.com",
+                "files": [
+                    "./**/*",
+                    "!/0.js",
+                    "!./package.json",
+                    "!./package-lock.json",
+                    "!./electron-builder.json"
+                ],
+                "dmg": {
+                    "contents": [
+                        {
+                            "x": 410,
+                            "y": 150,
+                            "type": "link",
+                            "path": "/Applications"
+                        },
+                        {
+                            "x": 130,
+                            "y": 150,
+                            "type": "file"
+                        }
+                    ]
+                },
+                "win": {
+                    "icon": path.resolve(__dirname, "../build/icons/icon.ico",),
+                    "target": [
+                        {
+                            "target": "nsis",
+                            "arch": [
+                                "ia32"
+                            ]
+                        }
+                    ]
+                },
+                "mac": {
+                    "icon": path.resolve(__dirname, "../build/icons/icon.icns"),
+                },
+                "linux": {
+                    "icon": path.resolve(__dirname, "../build/icons")
+                }
+            }
+        }).then(() => {
+            exec('node "./update/electron.js"', (error, stdout, stderr) => {
+                if (error) {
+                    throw error;
+                }
+                console.log(stdout);
+            });
+        }).catch(e => console.log(e));
+    });
 };
 const pack = config => {
     return new Promise((resolve, reject) => {
