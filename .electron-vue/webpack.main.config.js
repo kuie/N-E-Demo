@@ -5,6 +5,7 @@ process.env.BABEL_ENV = 'main'
 const path = require('path')
 const {dependencies} = require('../package.json')
 const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const BabiliWebpackPlugin = require('babel-minify-webpack-plugin')
 let whiteListedModules = ['asar'];
@@ -63,6 +64,16 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
+        new CopyWebpackPlugin([
+            {
+                from: path.join(__dirname, '../config/electron-builder.json'),
+                to: path.join(__dirname, '../dist/electron/electron-builder.json')
+            },
+            {
+                from: path.join(__dirname, '../dist/package.json'),
+                to: path.join(__dirname, '../dist/electron/package.json')
+            }
+        ]),
         new BabiliWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env.PLAY_MODE': '"electron"',

@@ -2,24 +2,26 @@
   "productName": "evt1",
   "appId": "club.kuie.www",
   "directories": {
-    "output": "../build/electron/v${version}/${os}/"
+    "output": "../../build/electron/v${version}/${os}/"
   },
   "nsis": {
     "oneClick": false,
     "allowElevation": false,
     "allowToChangeInstallationDirectory": true,
-    "installerIcon": "../build/icons/icon.ico",
-    "uninstallerIcon": "../build/icons/icon.ico",
-    "installerHeaderIcon": "../build/icons/icon.ico",
+    "installerIcon": "../../build/icons/icon.ico",
+    "uninstallerIcon": "../../build/icons/icon.ico",
+    "installerHeaderIcon": "../../build/icons/icon.ico",
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "shortcutName": "通宝Demo"
   },
   "copyright": "www.qudao.com",
   "files": [
-    "./electron/**/*",
-    "!./electron/0.js",
-    "!./package-lock.json"
+    "./**/*",
+    "!/0.js",
+    "!./package.json",
+    "!./package-lock.json",
+    "!./electron-builder.json"
   ],
   "dmg": {
     "contents": [
@@ -37,7 +39,7 @@
     ]
   },
   "win": {
-    "icon": "../build/icons/icon.ico",
+    "icon": "../../build/icons/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -48,7 +50,7 @@
     ]
   },
   "mac": {
-    "icon": "../build/icons/icon.icns"
+    "icon": "../../build/icons/icon.icns"
   },
   "linux": {
     "icon": "../build/icons"

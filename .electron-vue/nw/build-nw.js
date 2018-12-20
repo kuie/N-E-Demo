@@ -1,10 +1,8 @@
 const path = require('path');
 const fs = require('fs');
-const manifest = require('./buildConfig').nw;
-const config = require('./nw/config');
-
+const manifest = require('../buildConfig').nw;
+const config = require('./config');
 const manifestPath = path.resolve(config.build.assetsRoot, 'package.json');
-
 module.exports = new Promise((resolve, reject) => fs.writeFile(manifestPath, JSON.stringify(manifest, null, '  '), 'utf-8', function (err) {
     if (err) reject(err);
     // 开始构建app

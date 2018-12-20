@@ -80,12 +80,13 @@ exports.setMainEntry = function (type, mode) {
     if (type === 'nw') {
         json.window = wConfig;
     } else if (type === 'electron') {
+        /*这里的package.json 放置在dist/electron/文件夹下*/
         const typePackage = {
             name: json.name,
             version: json.version,
             author: json.author,
             description: json.description,
-            main: `./electron/main.js`
+            main: `./main.js`
         };
         const typePackagePath = path.resolve('./', 'dist', 'package.json');
         fs.writeFileSync(typePackagePath, JSON.stringify(typePackage, null, '  '), 'utf-8');

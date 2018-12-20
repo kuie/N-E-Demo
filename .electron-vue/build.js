@@ -3,10 +3,12 @@ process.env.NODE_ENV = 'production';
 require('./utils').setMainEntry(process.env.BUILD_TARGET, 'production');
 //版本检查 关联 package.json 的engines
 require('./nw/check-versions')();
+//特效文字
 const {say} = require('cfonts');
 const chalk = require('chalk');
 const del = require('del');
 const webpack = require('webpack');
+//多任务展示
 const Multispinner = require('multispinner');
 const mainConfig = require('./webpack.main.config');
 const rendererConfig = require('./webpack.renderer.config');
@@ -15,23 +17,9 @@ const nwProdConfig = require('./nw/webpack.prod.conf');
 const doneLog = chalk.bgGreen.white(' DONE ') + ' ';
 const errorLog = chalk.bgRed.white(' ERROR ') + ' ';
 const okayLog = chalk.bgBlue.white(' OKAY ') + ' ';
-
 const isCI = process.env.CI || false;
-
-switch (process.env.BUILD_TARGET) {
-    case 'clean':
-        return clean();
-    case 'web':
-        return web();
-    case 'nw':
-        return nw();
-    case 'electron':
-        return electron();
-    default:
-        return build();
-}
-
-function nw() {
+const path = require('path');
+const nw = () => {
     greeting();
     del.sync(['../dist/nw/*', '!.gitkeep']);
     const tasks = ['renderer', 'build-win-setup'];
@@ -49,7 +37,7 @@ function nw() {
         .then(result => {
             results += result + '\n\n';
             m.success('renderer', '测试一下');
-            return require('./build-nw');
+            return require('./nw/build-nw');
         })
         .catch(err => m.error('renderer'))
         .then(mainConfig => require('./nw/build-win-setup.js')().then(() => {
@@ -58,15 +46,13 @@ function nw() {
         }))
         .then(manifest => require('./nw/build-upgrade')(manifest))
         .catch(err => m.error('build-win-setup'));
-}
-
-function clean() {
+};
+const clean = () => {
     del.sync(['build/*', '!build/icons', '!build/icons/icon.*']);
     console.log(`\n${doneLog}\n`);
     process.exit();
-}
-
-function build() {
+};
+const build = () => {
     greeting();
 
     del.sync(['dist/base/*', '!.gitkeep']);
@@ -104,9 +90,8 @@ function build() {
         console.error(`\n${err}\n`);
         process.exit(1);
     });
-}
-
-function electron() {
+};
+const electron = () => {
     greeting();
 
     del.sync(['dist/electron/*', '!.gitkeep']);
@@ -135,7 +120,8 @@ function electron() {
             console.log(`\n  ${errorLog}failed to build main process`);
             console.error(`\n${err}\n`);
             process.exit(1);
-        });
+        })
+        .finally(() => del([path.resolve(__dirname, '../dist/package.json')]));
 
     pack(rendererConfig)
         .then(result => {
@@ -148,9 +134,8 @@ function electron() {
             console.error(`\n${err}\n`);
             process.exit(1);
         });
-}
-
-function pack(config) {
+};
+const pack = config => {
     return new Promise((resolve, reject) => {
         webpack(config, (err, stats) => {
 
@@ -177,9 +162,8 @@ function pack(config) {
             }
         })
     })
-}
-
-function web() {
+};
+const web = () => {
     del.sync(['dist/web/*', '!.gitkeep']);
     webpack(webConfig, (err, stats) => {
         if (err || stats.hasErrors()) console.log(err);
@@ -191,14 +175,26 @@ function web() {
 
         process.exit();
     })
-}
-
-function greeting() {
+};
+const greeting = () => {
     const cols = process.stdout.columns;
     let text = '';
-    if (cols > 85) text = 'lets-build';
-    else if (cols > 60) text = 'lets-|build';
+    if (cols > 85) text = 'node-webkit';
+    else if (cols > 60) text = 'node-webkit';
     else text = false;
     if (text && !isCI) say(text, {colors: ['yellow'], font: 'simple3d', space: false});
-    else console.log(chalk.yellow.bold('\n  lets-build'));
+    else console.log(chalk.yellow.bold('\n  node-webkit Build'));
+};
+
+switch (process.env.BUILD_TARGET) {
+    case 'clean':
+        return clean();
+    case 'web':
+        return web();
+    case 'nw':
+        return nw();
+    case 'electron':
+        return electron();
+    default:
+        return build();
 }
